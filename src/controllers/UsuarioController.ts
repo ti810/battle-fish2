@@ -54,6 +54,6 @@ export class UsuarioController {
         console.error('Erro no login:', error)
         return { success: false, message: 'Erro interno' }
       }
-    })   
+    })
   }
 }

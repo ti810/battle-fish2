@@ -13,13 +13,12 @@ export interface UserCustomer {
   criado_em: string
 }
 
-export interface NewMemberCustomer{
+export interface NewMemberCustomer {
   nome: string
   grupo_id: number
 }
 
-
-export interface MemberCustomer{
+export interface MemberCustomer {
   id: number
   nome: string
   grupo_id: number

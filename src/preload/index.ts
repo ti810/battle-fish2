@@ -12,7 +12,7 @@ declare global {
 
 // Custom APIs for renderer
 const api = {
-  login: (data: { usuario: string, senha: string}) => ipcRenderer.invoke('auth:login', data),
+  login: (data: { usuario: string; senha: string }) => ipcRenderer.invoke('auth:login', data),
   logout: () => ipcRenderer.invoke('app:logout'),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
   addUsuario: (doc: NewCustomer) => ipcRenderer.invoke('addUsuario', doc)

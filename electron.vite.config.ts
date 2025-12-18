@@ -7,7 +7,7 @@ export default defineConfig({
   main: {
     plugins: [
       viteStaticCopy({
-        targets:[
+        targets: [
           {
             src: 'resources/*',
             dest: 'resources'
@@ -23,9 +23,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [
-      react(),
-      tailwindcss(),
-    ]
+    plugins: [react(), tailwindcss()]
   }
 })
