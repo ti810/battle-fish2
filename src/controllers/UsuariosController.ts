@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 import { UsuarioModel } from '../models/UsuarioModel'
 import DatabaseConstructor from 'better-sqlite3'
 
-export class UsuarioController {
+export class UsuariosController {
   private model: UsuarioModel
   private db: InstanceType<typeof DatabaseConstructor>
 

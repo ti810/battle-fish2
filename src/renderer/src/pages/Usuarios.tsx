@@ -75,7 +75,7 @@ export default function Usuarios() {
           <div className="space-y-12">
             {usuarios.map((item) => (          
 
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs">AD</div>
                   <div>

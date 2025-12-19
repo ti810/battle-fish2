@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewCustomer } from '../shared/types/interfaces'
+import { NewGroupCustomer, NewUserCustomer } from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -15,7 +15,10 @@ const api = {
   login: (data: { usuario: string, senha: string}) => ipcRenderer.invoke('auth:login', data),
   logout: () => ipcRenderer.invoke('app:logout'),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
-  addUsuario: (doc: NewCustomer) => ipcRenderer.invoke('addUsuario', doc)
+  addNovoGrupo: (doc: NewGroupCustomer) => ipcRenderer.invoke('addNovoGrupo', doc),
+  listarGrupos: () => ipcRenderer.invoke('listarGrupos'),
+  listarMembros: () => ipcRenderer.invoke('listarMembors'),
+  addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
