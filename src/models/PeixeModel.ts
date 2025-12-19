@@ -1,7 +1,7 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { MemberCustomer } from '../shared/types/interfaces'
+import { PeixeCustomer } from '../shared/types/interfaces'
 
-export class MemberModel {
+export class PeixeModel {
   private db: InstanceType<typeof DatabaseConstructor>
 
   constructor(db: InstanceType<typeof DatabaseConstructor>) {
@@ -11,25 +11,21 @@ export class MemberModel {
 
   private criarTabela(): void {
     this.db.exec(`
-      CREATE TABLE IF NOT EXISTS membros(
+      CREATE TABLE IF NOT EXISTS peixes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        grupo_id         
+        id_membro INTEGER NOT NULL       
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
-        atualizado_em TEXT,
-        deletado_em TEXT
+        FOREIGN KEY (id_membro) REFERENCES meembros(id) ON DELETE CASCADE
       )
     `)
   }
 
-  listar(): MemberCustomer[] {
+  listar(): PeixeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, email, senha, criado_em, atualizado_em, deletado_em
-      FROM usuarios
-      WHERE deletado_em IS NULL
-      ORDER BY criado_em DESC
+      SELECT * FROM peixes ORDER BY criado_em DESC
     `)
 
-    return stmt.all() as MemberCustomer[]
+    return stmt.all() as PeixeCustomer[]
   }
 }

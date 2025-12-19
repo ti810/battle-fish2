@@ -23,3 +23,19 @@ export interface MemberCustomer {
   nome: string
   grupo_id: number
 }
+
+export interface PeixeCustomer {
+  id: number
+  tipo: string
+  tamanho: string
+  peso: string
+  id_membro: number
+}
+
+export interface NewPeixeCustomer {
+  id: number
+  tipo: string
+  tamanho: string
+  peso: string
+  id_membro: number
+}
