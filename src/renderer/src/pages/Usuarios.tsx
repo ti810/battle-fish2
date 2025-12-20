@@ -1,25 +1,31 @@
-import { Shield, User, Lock, Key } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { Shield, User, Lock, Key } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
-import { UserCustomer } from '~/src/shared/types/interfaces'
+import { UserCustomer } from '~/src/shared/types/interfaces';
 
 export default function Usuarios() {
+
   const ran = useRef(false)
 
   const [usuarios, setUsuarios] = useState<UserCustomer[]>([])
   const [loading, setLoading] = useState(false)
 
   async function listarUsuarios() {
+
     try {
+
       setLoading(true)
       const data: UserCustomer[] = await window.api.listarUsuarios()
       setUsuarios(data)
+
     } catch (error) {
-      console.log('Erro', error)
+      console.log("Erro", error)
     } finally {
       setLoading(false)
     }
+
+
   }
 
   useEffect(() => {
@@ -31,6 +37,12 @@ export default function Usuarios() {
   useEffect(() => {
     console.log(usuarios)
   }, [usuarios])
+
+
+
+
+
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -61,12 +73,11 @@ export default function Usuarios() {
           </div>
 
           <div className="space-y-12">
-            {usuarios.map((item) => (
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            {usuarios.map((item) => (          
+
+              <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs">
-                    AD
-                  </div>
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs">AD</div>
                   <div>
                     <p className="text-sm font-medium">{item.nome}</p>
                     <p className="text-xs text-gray-500">{item.email}</p>
@@ -74,12 +85,14 @@ export default function Usuarios() {
                 </div>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Online</span>
               </div>
+
             ))}
             <button className="w-full py-2 border border-dashed border-gray-300 rounded-lg text-gray-500 text-sm hover:bg-gray-50 hover:border-blue-300 hover:text-blue-600 transition-all">
               + Adicionar Administrador
             </button>
           </div>
         </motion.div>
+        
       </div>
 
       {/* Security Section */}
@@ -102,5 +115,5 @@ export default function Usuarios() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

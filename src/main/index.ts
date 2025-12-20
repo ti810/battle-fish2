@@ -5,7 +5,9 @@ import path from 'node:path'
 import { createTray } from './tray'
 
 import Database from 'better-sqlite3'
-import { UsuarioController } from '../controllers/UsuarioController'
+import { UsuariosController } from '../controllers/UsuariosController'
+import { GruposController } from '../controllers/GruposController'
+import { MembrosController } from '../controllers/MembrosController'
 const db = new Database('./src/database/app.db')
 
 let mainWindow: BrowserWindow | null = null
@@ -65,7 +67,9 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // const dbPath = path.join(__dirname, '..', 'database', 'app.db')
   // const db = new Database(dbPath)
-  new UsuarioController(db)
+  new UsuariosController(db)
+  new GruposController(db)
+  new MembrosController(db)
 
   electronApp.setAppUserModelId('com.electron')
 
