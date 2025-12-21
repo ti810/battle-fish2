@@ -1,19 +1,18 @@
-import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import {Trophy, Users, UserCircle, Fish, Menu, X, Anchor} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../lib/utils';
+import React from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Trophy, Users, UserCircle, Fish, Menu, X, Anchor } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '../lib/utils'
 
-import logo from '../assets/images/logo.png';
+import logo from '../assets/images/logo.png'
 
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
-    { to: "/", icon: Trophy, label: "Ranking" },
-    { to: "/grupos", icon: Fish, label: "Grupos" },
-    { to: "/membros", icon: Users, label: "Integrantes" },
-    { to: "/usuarios", icon: UserCircle, label: "Usuários" },
-
-  ];
+    { to: '/', icon: Trophy, label: 'Ranking' },
+    { to: '/grupos', icon: Fish, label: 'Grupos' },
+    { to: '/membros', icon: Users, label: 'Integrantes' },
+    { to: '/usuarios', icon: UserCircle, label: 'Usuários' }
+  ]
 
   return (
     <>
@@ -33,14 +32,14 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
       {/* Sidebar */}
       <motion.div
         className={cn(
-          "fixed h-full md:h-auto top-0 left-0 w-64 bg-linear-to-bl from-blue-50 to-blue-100 shadow-gray-400 z-50 transform md:translate-x-0 md:static md:shadow-lg",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          'fixed h-full md:h-auto top-0 left-0 w-64 bg-linear-to-bl from-blue-50 to-blue-100 shadow-gray-400 z-50 transform md:translate-x-0 md:static md:shadow-lg',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
         <div className="h-16 flex items-center justify-center border-b border-gray-100 bg-blue-600">
           <div className="flex items-center gap-2 text-white font-bold text-xl">
-            <img className='w-[50px] h-[50px] object-contain rounded-2xl' src={logo} />
+            <img className="w-[50px] h-[50px] object-contain rounded-2xl" src={logo} />
             {/* <Anchor className="w-6 h-6" /> */}
             <span>BattleFish</span>
           </div>
@@ -54,10 +53,10 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
               onClick={() => setIsOpen(false)}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
                   isActive
-                    ? "bg-blue-50 text-blue-600 shadow-sm font-medium translate-x-1"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? 'bg-blue-50 text-blue-600 shadow-sm font-medium translate-x-1'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 )
               }
             >
@@ -80,12 +79,12 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
         </div>
       </motion.div>
     </>
-  );
-};
+  )
+}
 
 export default function Layout() {
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
+  const location = useLocation()
 
   return (
     <div className="min-h-screen bg-slate-50 flex overflow-hidden font-sans">
@@ -123,5 +122,5 @@ export default function Layout() {
         </main>
       </div>
     </div>
-  );
+  )
 }

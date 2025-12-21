@@ -9,7 +9,7 @@ export class UsuarioModel {
     this.criarTabela()
   }
 
-  private criarTabela() {
+  private criarTabela(): void {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS usuarios(
         id INTEGER PRIMARY KEY AUTOINCREMENT,

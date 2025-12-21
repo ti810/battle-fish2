@@ -38,3 +38,19 @@ export interface GroupCustomer {
   ativo? : number
   qtde_membros: number
 }
+
+export interface PeixeCustomer {
+  id: number
+  tipo: string
+  tamanho: number
+  peso: number
+  id_membro: number
+  criado_em: number
+}
+
+export interface NewPeixeCustomer {
+  tipo: string
+  tamanho: number
+  peso: number
+  id_membro: number
+}
