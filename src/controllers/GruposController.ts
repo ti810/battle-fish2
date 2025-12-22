@@ -17,7 +17,10 @@ export class GruposController {
     ipcMain.handle('listarGrupos', async () => {
       try {
         // console.log(this.model.listar())
-        return this.model.listar()
+        return {
+          success: true,
+          data: this.model.listar()
+        }
       } catch (error) {
         console.error('Erro ao listar membors:', error)
         throw error
