@@ -6,6 +6,7 @@ import Usuarios from './pages/Usuarios'
 import Ranking from './pages/Ranking'
 import Login from './pages/Login'
 import { useState } from 'react'
+import { Toaster } from 'sonner'
 
 export default function App(): React.JSX.Element {
   const [usuario, setUsuario] = useState<any | null>(null)
@@ -19,15 +20,19 @@ export default function App(): React.JSX.Element {
   // }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Ranking />} />
-          <Route path="/membros" element={<Membros />} />
-          <Route path="/grupos" element={<Grupos />} />
-          <Route path="/usuarios" element={<Usuarios />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Toaster richColors position='bottom-right' />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Ranking />} />
+            <Route path="/membros" element={<Membros />} />
+            <Route path="/grupos" element={<Grupos />} />
+            <Route path="/usuarios" element={<Usuarios />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
+
   )
 }
