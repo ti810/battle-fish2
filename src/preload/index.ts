@@ -19,8 +19,11 @@ const api = {
   listarGrupos: () => ipcRenderer.invoke('listarGrupos'),
   listarMembros: () => ipcRenderer.invoke('listarMembors'),
   addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
-  addPeixe: (doc: NewPeixe) => ipcRenderer.invoke('addPeixe', doc),
-  listarPeixe: () => ipcRenderer.invoke('listarPeixe')
+  ///Peixes
+  addNovoPeixe: (doc: NewPeixe) => ipcRenderer.invoke('addNovoPeixe', doc),
+  listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
+  listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
+  deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
