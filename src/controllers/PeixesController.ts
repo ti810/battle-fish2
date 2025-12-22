@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { PeixeModel } from '../models/PeixeModel'
 import DatabaseConstructor from 'better-sqlite3'
-import { PeixeCustomer } from '../shared/types/interfaces'
+import { NewPeixe } from '../shared/types/interfaces'
 
 export class PeixesController {
   private model: PeixeModel
@@ -24,7 +24,7 @@ export class PeixesController {
       }
     })
 
-    ipcMain.handle('addNovoPeixe', (_, doc: NewPeixeCustomer) => {
+    ipcMain.handle('addNovoPeixe', (_, doc: NewPeixe) => {
       try {
         return {
           success: true,
@@ -32,6 +32,24 @@ export class PeixesController {
         }
       } catch (error) {
         console.error('Erro ao adicionar novo grupo:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('listarPeixeById', (event, id) => {
+      try {
+        return this.model.listarById(id)
+      } catch (error) {
+        console.error('Erro ao buscar peixe', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('deletarPeixe', (event, id) => {
+      try {
+        return this.model.delete(id)
+      } catch (error) {
+        console.error('Erro ao deletar peixe', error)
         throw error
       }
     })
