@@ -12,13 +12,15 @@ declare global {
 
 // Custom APIs for renderer
 const api = {
+  //Usuário
   login: (data: { usuario: string, senha: string}) => ipcRenderer.invoke('auth:login', data),
   logout: () => ipcRenderer.invoke('app:logout'),
+  addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
+  //Grupos
   addNovoGrupo: (doc: NewGroupCustomer) => ipcRenderer.invoke('addNovoGrupo', doc),
   listarGrupos: () => ipcRenderer.invoke('listarGrupos'),
   listarMembros: () => ipcRenderer.invoke('listarMembors'),
-  addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
   ///Peixes
   addNovoPeixe: (doc: NewPeixe) => ipcRenderer.invoke('addNovoPeixe', doc),
   listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
