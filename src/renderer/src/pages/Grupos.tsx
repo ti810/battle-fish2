@@ -1,33 +1,36 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Plus, Search, Fish, MoreVertical, Scale, Ruler, Users } from 'lucide-react';
 import { findDimensionValueType, motion } from 'framer-motion';
 import { agoraParaSQLite } from '../lib/utils';
 import { NewGroupCustomer, GroupCustomer } from '~/src/shared/types/interfaces';
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
-import { form } from 'framer-motion/client';
+import { formValidation } from '../hooks/formValidation';
+import { grupoSchema } from '../hooks/formValidation';
+import { preview } from 'vite';
 
 
 
 
 export default function Grupos() {
   const [loading, setLoading] = useState(false);
+
+  const nomeRef = useRef<HTMLInputElement>(null)
+  const qtdeRef = useRef<HTMLInputElement>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+
+
+
   const [showAddCatchModal, setShowAddCatchModal] = useState(false);
   const [showAddGroupModal, setShowAddGroupModal] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [grupos, setGrupos] = useState<GroupCustomer[]>([])
 
-  // const [groups, setGroups] = useState<Grupo[]>([
-  //   { id: 1, name: 'Pescadores do Sul', members: 4, catches: 15, lastCatch: '10 min atrás', status: 'Ativo' },
-  // ]);
-
-  // const [catches, setCatches] = useState<Catch[]>([]);
-
   // Form states
   const [catchForm, setCatchForm] = useState({ groupId: 1, species: '', weight: '', size: '' });
   const [grupoForm, setGrupoForm] = useState<NewGroupCustomer>({
-    nome: '',
-    qtde_membros: 0,
+    nome: "",
+    qtde_membros: 1,
     criado_em: agoraParaSQLite()
   });
 
@@ -66,11 +69,31 @@ export default function Grupos() {
   const handleAddGroup = async () => {
     try {
 
-      setLoading(true)
+      const validationRules = formValidation(grupoSchema, grupoForm)
 
-      if (!grupoForm.nome && !grupoForm.qtde_membros || Number(grupoForm.qtde_membros) <= 0) {
-        return toast.error("Campos (Nome da Equipe e Número de integrantes) obrigatórios")
-      };
+      if (!validationRules.success) {
+        setFieldErrors(validationRules.fieldErrors)
+        const firstField = Object.keys(validationRules.fieldErrors)[0]
+        console.log(firstField)
+        if (firstField === "nome") {
+          nomeRef.current?.focus()
+        }
+
+        if (firstField === "qtde_membros") {
+          qtdeRef.current?.focus()
+        }
+
+        toast.error(
+          <div className="space-y-1">
+            {Object.values(validationRules.fieldErrors).map((err, index) => (
+              <p key={index}>• {err}</p>
+            ))}
+          </div>
+        )
+
+        return
+      }
+      setLoading(true)
 
       const res = await window.api.addNovoGrupo(grupoForm)
 
@@ -82,6 +105,7 @@ export default function Grupos() {
         fetchListGroup()
 
       }
+
 
     } catch (error) {
       console.log("Erro ao salvar dados do Grupo", error)
@@ -312,9 +336,18 @@ export default function Grupos() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Equipe <span className='text-red-600'>*</span></label>
                   <input
                     type="text"
+                    ref={nomeRef}
                     value={grupoForm.nome}
-                    onChange={(e) => setGrupoForm({ ...grupoForm, nome: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                    onChange={
+                      (e) => {
+                        setGrupoForm({ ...grupoForm, nome: e.target.value })
+                        setFieldErrors((prev) => {
+                          const { nome, ...rest } = prev
+                          return rest
+                        })
+                      }
+                    }
+                    className={`${fieldErrors.nome ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="Ex: Pescadores do Norte"
                   />
                 </div>
@@ -322,9 +355,16 @@ export default function Grupos() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Número de Integrantes <span className='text-red-600'>*</span></label>
                   <input
                     type="number"
+                    ref={qtdeRef}
                     value={grupoForm.qtde_membros}
-                    onChange={(e) => setGrupoForm({ ...grupoForm, qtde_membros: Number(e.target.value) })}
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                    onChange={(e) => {
+                      setGrupoForm({ ...grupoForm, qtde_membros: Number(e.target.value) })
+                      setFieldErrors((prev) => {
+                        const { qtde_membros, ...rest } = prev
+                        return rest
+                      })
+                    }}
+                    className={`${fieldErrors.qtde_membros ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="1"
                     min="1"
                   />

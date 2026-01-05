@@ -1,5 +1,6 @@
 import DatabaseConstructor from 'better-sqlite3'
 import { GroupCustomer, NewGroupCustomer } from '../shared/types/interfaces'
+import z from 'zod'
 
 export class GrupoModel {
   private db: InstanceType<typeof DatabaseConstructor>

@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.1.17",
     "better-sqlite3": "^12.5.0",
     "bootstrap": "^4.6.2",
@@ -30,10 +31,12 @@
     "express": "^5.2.1",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.559.0",
+    "react-hook-form": "^7.69.0",
     "react-router-dom": "^7.10.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "vite-plugin-static-copy": "^3.1.4"
+    "vite-plugin-static-copy": "^3.1.4",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
