@@ -16,31 +16,31 @@ export class PeixeModel {
         tipo TEXT NOT NULL,
         tamanho FLOAT,
         peso FLOAT, 
-        id_membro INTEGER NOT NULL,      
+        id_grupo INTEGER NOT NULL,      
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
         deletado_em TEXT,
-        FOREIGN KEY (id_membro) REFERENCES membros(id) ON DELETE CASCADE
+        FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE
       )
     `)
   }
 
   add(data: NewPeixe): number {
     const stmt = this.db.prepare(`
-      INSERT INTO peixes (tipo, tamanho, peso, id_membro) 
+      INSERT INTO peixes (tipo, tamanho, peso, id_grupo) 
       VALUES (?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.tipo, data.tamanho, data.peso, data.id_membro)
+    const res = stmt.run(data.tipo, data.tamanho, data.peso, data.id_grupo)
 
     return Number(res.lastInsertRowid)
   }
 
   listar(): PeixeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT p.id, p.tipo, p.tamanho, p.peso, m.nome as nome_membro, p.criado_em
+      SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo, p.criado_em
       FROM peixes p
-      JOIN membros m ON p.id_membro = m.id
+      JOIN grupos g ON p.id_grupo = g.id
       WHERE p.deletado_em IS NULL
       ORDER BY p.criado_em DESC
     `)
@@ -50,9 +50,9 @@ export class PeixeModel {
 
   listarById(id: number): PeixeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT p.id, p.tipo, p.tamanho, p.peso, m.nome as nome_membro
+      SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo
       FROM peixes p
-      JOIN membros m ON m.id = p.id_membro
+      JOIN grupos g ON g.id = p.id_grupo
       WHERE p.id = ?
       ORDER by p.criado_em
     `)

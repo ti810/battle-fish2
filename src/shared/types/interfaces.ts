@@ -44,7 +44,7 @@ export interface PeixeCustomer {
   tipo: string
   tamanho: number
   peso: number
-  nome_membro: string
+  nome_grupo: string
   criado_em: number
 }
 
@@ -52,5 +52,5 @@ export interface NewPeixe {
   tipo: string
   tamanho: number
   peso: number
-  id_membro: number
+  id_grupo: number
 }
