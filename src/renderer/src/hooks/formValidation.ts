@@ -29,3 +29,14 @@ export const grupoSchema = z.object({
     .max(50, 'Nome do Grupo é muito longo'),
   qtde_membros: z.number().min(2, 'Quantidade de Membros por Grupos no minimo 2')
 })
+
+export const peixeSchema = z.object({
+  tipo: z
+    .string()
+    .trim()
+    .min(4, 'Nome do peixe está muito curto')
+    .max(50, 'Nome do peixe está muito longo'),
+  tamanho: z.number().min(0.1, 'Tamanho de peixe tem que ser maior que 1 centimetro'),
+  peso: z.number().min(0.01, 'Peso do peixe precisa ser maior que 10 gramas'),
+  
+})
