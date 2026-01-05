@@ -62,9 +62,3 @@
 
 /* Animation Loader Dot  */
 
-.dropdown-menu{
-  /* background: red; */
-  display: flex; 
-  flex-direction: column;
-  align-items: end;
-}

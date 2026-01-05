@@ -16,7 +16,7 @@ export default function Grupos() {
   const nomeRef = useRef<HTMLInputElement>(null)
   const qtdeRef = useRef<HTMLInputElement>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
-  const[dropdownMenu, setDropdownMenu] = useState(false)
+  const [openMenu, setOpeMenu] = useState(false)
 
 
 
@@ -114,9 +114,6 @@ export default function Grupos() {
     }
 
   };
-  const handleDropDown = (idx: number) =>{ 
-    setDropdownMenu(!dropdownMenu)
-  }
 
   const fetchListGroup = async () => {
     try {
@@ -209,16 +206,21 @@ export default function Grupos() {
                     </span>
                   </div>
                 </div>
-                <div className='dropdown-menu'>
-                  <button onClick={() => handleDropDown(idx)} type='button' className="text-gray-400 hover:text-gray-600">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
-                  <div className={`bg-white ${dropdownMenu ? 'inline' : 'hidden'} float-right text-gray-500 drop-shadow-lg drop-shadow-neutral-400 rounded-[5px] text-left`}>
-                    <ul className='p-2'>
-                      <li className='flex flex-row p-1'><Edit className="w-5 h-5"/>&nbsp;&nbsp;Editar</li>
-                      <li className='flex flex-row p-1'><Trash className="w-5 h-5"/>&nbsp;&nbsp;Deletar</li>
-                    </ul>
+                <div className='bg-white'>
+                  <div className="relative flex flex-col items-end">
+                    <button onClick={() => setOpeMenu(!openMenu)} type='button' className="text-gray-400 hover:text-gray-600">
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                    {openMenu && (
+                      <div className='float-right text-gray-500 bg-white drop-shadow-lg drop-shadow-gray-700 rounded-[5px] text-left'>
+                        <a className='px-4 py-2 hover:bg-gray-300 flex flex-row'><Edit className="w-5 h-5" />&nbsp;&nbsp;Editar</a>
+                        <a className='px-4 py-2 hover:bg-gray-300 flex flex-row'><Trash className="w-5 h-5" />&nbsp;&nbsp;Deletar</a>
+                      </div>
+                    )}
+
                   </div>
+
+
                 </div>
               </div>
 
