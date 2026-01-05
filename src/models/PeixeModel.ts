@@ -1,5 +1,5 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { PeixeCustomer, NewPeixeCustomer } from '../shared/types/interfaces'
+import { PeixeCustomer, NewPeixe } from '../shared/types/interfaces'
 
 export class PeixeModel {
   private db: InstanceType<typeof DatabaseConstructor>
@@ -25,7 +25,7 @@ export class PeixeModel {
     `)
   }
 
-  add(data: NewPeixeCustomer): number {
+  add(data: NewPeixe): number {
     const stmt = this.db.prepare(`
       INSERT INTO peixes (tipo, tamanho, peso, id_membro) 
       VALUES (?, ?, ?, ?)

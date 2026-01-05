@@ -44,11 +44,11 @@ export interface PeixeCustomer {
   tipo: string
   tamanho: number
   peso: number
-  id_membro: number
+  nome_membro: string
   criado_em: number
 }
 
-export interface NewPeixeCustomer {
+export interface NewPeixe {
   tipo: string
   tamanho: number
   peso: number

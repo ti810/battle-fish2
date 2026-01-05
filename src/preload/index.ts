@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewGroupCustomer, NewUserCustomer } from '../shared/types/interfaces'
+import { NewGroupCustomer, NewUserCustomer, NewPeixe } from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -12,13 +12,20 @@ declare global {
 
 // Custom APIs for renderer
 const api = {
+  //Usuário
   login: (data: { usuario: string, senha: string}) => ipcRenderer.invoke('auth:login', data),
   logout: () => ipcRenderer.invoke('app:logout'),
+  addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
+  //Grupos
   addNovoGrupo: (doc: NewGroupCustomer) => ipcRenderer.invoke('addNovoGrupo', doc),
   listarGrupos: () => ipcRenderer.invoke('listarGrupos'),
   listarMembros: () => ipcRenderer.invoke('listarMembors'),
-  addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc)
+  ///Peixes
+  addNovoPeixe: (doc: NewPeixe) => ipcRenderer.invoke('addNovoPeixe', doc),
+  listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
+  listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
+  deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
