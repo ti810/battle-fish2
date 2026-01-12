@@ -1,5 +1,5 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { MemberCustomer } from '../shared/types/interfaces'
+import { MemberCustomer, NewMemberCustomer } from '../shared/types/interfaces'
 
 export class MembroModel {
   private db: InstanceType<typeof DatabaseConstructor>
@@ -25,6 +25,13 @@ export class MembroModel {
       )
     `)
   }
+  add(data: NewMemberCustomer): number {
+    const stmt = this.db.prepare(`
+        INSERT INTO membros nome, grupo_id) 
+        VALUES (?, ?, ?, ?)`)
+    const res = stmt.run(data.nome, data.grupo_id)
+    return Number(res.lastInsertRowid)
+  }
 
   listar(): MemberCustomer[] {
     const stmt = this.db.prepare(`
@@ -35,5 +42,23 @@ export class MembroModel {
     `)
 
     return stmt.all() as MemberCustomer[]
+  }
+
+  buscarById(id: number): MemberCustomer | null {
+    const stmt = this.db.prepare(`
+      SELECT id, nome, grupo_id
+      FROM membros
+      WHERE id = ?
+       `)
+
+    return (stmt.get(id) ?? null) as MemberCustomer | null
+  }
+
+  deletar(id: number): boolean {
+    const stmt = this.db.prepare(`
+      DELETE FROM membros
+      WHERE id =?`)
+    const res = stmt.run(id)
+    return res.changes > 0
   }
 }

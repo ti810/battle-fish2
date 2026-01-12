@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 import { PeixeModel } from '../models/PeixeModel'
 import DatabaseConstructor from 'better-sqlite3'
 import { NewPeixe } from '../shared/types/interfaces'
-
+import { peixeSchema } from '../renderer/src/hooks/formValidation'
 
 export class PeixesController {
   private model: PeixeModel
@@ -29,7 +29,7 @@ export class PeixesController {
       try {
         return {
           success: true,
-          data: this.model.adicionar(doc)
+          data: this.model.add(doc)
         }
       } catch (error) {
         console.error('Erro ao adicionar novo grupo:', error)
@@ -39,7 +39,7 @@ export class PeixesController {
 
     ipcMain.handle('listarPeixeById', (event, id) => {
       try {
-        return this.model.listarById(id)
+        return this.model.buscarById(id)
       } catch (error) {
         console.error('Erro ao buscar peixe', error)
         throw error
