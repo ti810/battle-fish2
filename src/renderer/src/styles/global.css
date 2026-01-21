@@ -1,32 +1,33 @@
 @import "tailwindcss";
 
 @font-face {
-    font-family: 'Roboto';
-    src: url('../fonts/Roboto/Roboto.ttf') format('truetype'),
-        url('../fonts/Roboto/Roboto-Italic.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto/Roboto.ttf') format('truetype'),
+    url('../fonts/Roboto/Roboto-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Amarna';
-    src: url('../fonts/Amarna/Amarna.ttf') format('truetype'),
-        url('../fonts/Amarna/Amarna-Italic.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'Amarna';
+  src: url('../fonts/Amarna/Amarna.ttf') format('truetype'),
+    url('../fonts/Amarna/Amarna-Italic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
 }
 
-@layer base{
-    :root{
-        --font-sans: 'Amarna','Roboto', Arial, Helvetica, sans-serif
-    }
-    body{
-        font-family: var(--font-sans);
-    }
+@layer base {
+  :root {
+    --font-sans: 'Amarna', 'Roboto', Arial, Helvetica, sans-serif
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
 }
 
-.shadow-top{
-    box-shadow: -2px -3px 5px 0px rgba(0,0,0, .2);
+.shadow-top {
+  box-shadow: -2px -3px 5px 0px rgba(0, 0, 0, .2);
 }
 
 /* Animation Loader Dot  */
@@ -52,9 +53,11 @@
   0% {
     opacity: 0.2;
   }
+
   20% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.2;
   }
@@ -62,3 +65,29 @@
 
 /* Animation Loader Dot  */
 
+
+/* DropdownMenu  */
+/* Menu escondido */
+.dropdown-menu {
+  min-width: 140px;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.dropdown-menu.active {
+  opacity: 1;
+  visibility: visible;
+  animation: dropdown-open ease-in .1s;
+}
+
+@keyframes dropdown-open {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

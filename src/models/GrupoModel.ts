@@ -35,6 +35,33 @@ export class GrupoModel {
     return stmt.all() as GroupCustomer[]
   }
 
+  getById(id: number): GroupCustomer | null {
+    const stmt = this.db.prepare(`
+      SELECT id, nome, ativo, qtde_membros, criado_em
+      FROM grupos
+      WHERE deletado_em IS NULL
+        AND id = ?
+      LIMIT 1
+    `)
+
+    return stmt.get(id) as GroupCustomer
+  }
+
+  edit(data: GroupCustomer): GroupCustomer | null {
+    const stmt = this.db.prepare(`
+      UPDATE grupos
+      SET nome = ?, qtde_membros = ?      
+      WHERE id = ?      
+    `)
+
+    const result = stmt.run(data.nome, data.qtde_membros, data.id)
+    if (result.changes === 0) {
+      return null
+    }
+
+    return this.getById(data.id)
+  }
+
   add(data: NewGroupCustomer): NewGroupCustomer {
     const stmt = this.db.prepare(`
       INSERT INTO grupos (nome, ativo, criado_em, qtde_membros) 
@@ -50,5 +77,15 @@ export class GrupoModel {
     `)
 
     return select.get(res.lastInsertRowid) as NewGroupCustomer
+  }
+
+  delete(id: number): boolean {
+    const stmt = this.db.prepare(`
+      DELETE from grupos 
+      WHERE id = ?
+    `)
+
+    const result = stmt.run(id)
+    return result.changes > 0
   }
 }

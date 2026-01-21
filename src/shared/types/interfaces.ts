@@ -9,7 +9,7 @@ export interface UserCustomer {
   id: number
   nome: string
   email?: string | null
-  grupo_id: number 
+  grupo_id: number
   usuario?: string
   criado_em: string
 }
@@ -26,8 +26,9 @@ export interface MemberCustomer {
 }
 
 export interface NewGroupCustomer {
+  id: number
   nome: string
-  ativo? : number
+  ativo?: number
   qtde_membros: number
   criado_em: string
 }
@@ -35,7 +36,7 @@ export interface NewGroupCustomer {
 export interface GroupCustomer {
   id: number
   nome: string
-  ativo? : number
+  ativo?: number
   qtde_membros: number
 }
 
@@ -44,13 +45,14 @@ export interface PeixeCustomer {
   tipo: string
   tamanho: number
   peso: number
-  nome_grupo: string
+  nome_membro: string
   criado_em: number
 }
 
-export interface NewPeixe {
+export interface NewPeixeCustomer {
+  id: number
   tipo: string
   tamanho: number
   peso: number
-  id_grupo: number
+  id_membro: number
 }
