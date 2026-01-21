@@ -6,7 +6,7 @@ import { NewGroupCustomer, GroupCustomer, PeixeCustomer, NewPeixeCustomer } from
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
-import { grupoSchema } from '../hooks/formValidation';
+import { grupoSchema, peixeSchema } from '../hooks/formValidation';
 import { Rifm } from 'rifm';
 
 
@@ -24,13 +24,14 @@ export default function Grupos() {
   const qtdeRef = useRef<HTMLInputElement>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
-  const [showAddFishModal, setShowAddFishModal] = useState(false);
+  const [showAddPeixeModal, setShowAddPeixeModal] = useState(false);
   const [showAddGroupModal, setShowAddGroupModal] = useState(false);
   const [showEditGroupModal, setShowEditGroupModal] = useState(false);
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
   const [grupos, setGrupos] = useState<GroupCustomer[]>([])
   const [peixes, setPeixes] = useState<GroupCustomer[]>([])
   const [grupoId, setGrupoId] = useState<number | null>(null)
+
 
   // Form states
   const [grupoForm, setGrupoForm] = useState<NewGroupCustomer | GroupCustomer>({
@@ -45,8 +46,7 @@ export default function Grupos() {
     tipo: "",
     tamanho: "",
     peso: "",
-    nome_membro: "",
-    id_membro: Number(null as number | null),
+    id_grupo: Number(null as number | null),
     criado_em: agoraParaSQLite()
   });
 
@@ -62,7 +62,7 @@ export default function Grupos() {
 
 
   // CRUD Grupo 
- 
+
   const handleEditGroup = async () => {
     try {
 
@@ -187,22 +187,17 @@ export default function Grupos() {
 
   // CRUD Peixe 
 
-    const handleAddPeixe = async () => {
+  const handleAddPeixe = async () => {
     try {
 
-      const validationRules = formValidation(peixeSchema, peixeFormForm)
+      const validationRules = formValidation(peixeSchema, peixeForm)
 
       if (!validationRules.success) {
         setFieldErrors(validationRules.fieldErrors)
         const firstField = Object.keys(validationRules.fieldErrors)[0]
-        if (firstField === "nome") {
+        if (firstField === "tipo") {
           nomeRef.current?.focus()
         }
-
-        if (firstField === "qtde_membros") {
-          qtdeRef.current?.focus()
-        }
-
         toast.error(
           <div className="space-y-1">
             {Object.values(validationRules.fieldErrors).map((err, index) => (
@@ -215,21 +210,29 @@ export default function Grupos() {
       }
       setLoading(true)
 
-      const res = await window.api.addNovoGrupo(grupoForm as NewGroupCustomer)
+      const data = { ...peixeForm, id_grupo: Number(grupoId) }
+      setPeixeForm(data);
 
-      if (res.success) {
-        toast.success("Grupo salvo com sucesso")
-        // Limpar valores dos Inputs 
-        setGrupoForm(initialGrupoForm)
-        setShowAddGroupModal(false)
-        fetchListGroup()
+      console.log(peixeForm)
 
-      }
+
+
+      // const res = await window.api.addNovoPeixe(peixeForm as NewPeixeCustomer)
+
+      // if (res.success) {
+      //   toast.success("Peixe salvo com sucesso")
+      //   // Limpar valores dos Inputs 
+      //   // setPeixeForm({
+
+      //   // })
+      //   setShowAddPeixeModal(false)
+
+      // }
 
 
     } catch (error) {
-      console.log("Erro ao salvar dados do Grupo", error)
-      toast.error(`Erro ao salvar dados do Grupo ${error}`)
+      console.log("Erro ao salvar dados do Peixe", error)
+      toast.error(`Erro ao salvar dados do Peixe ${error}`)
     } finally {
       setLoading(false)
     }
@@ -287,6 +290,10 @@ export default function Grupos() {
 
   }, [])
 
+  useEffect(() => {
+    setGrupoId(grupoForm.id)
+  }, [grupoForm])
+
 
   return (
     <>
@@ -299,7 +306,7 @@ export default function Grupos() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => setShowAddFishModal(true)}
+              onClick={() => setShowAddPeixeModal(true)}
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-green-200"
             >
               <Fish className="w-4 h-4" />
@@ -438,7 +445,7 @@ export default function Grupos() {
         </div>
 
         {/* Add Catch Modal */}
-        {showAddFishModal && (
+        {showAddPeixeModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -455,7 +462,10 @@ export default function Grupos() {
 
                   <select
                     value={grupoForm.id ?? null}
-                    onChange={(e) => setGrupoForm({ ...grupoForm, id: Number(e.target.value) })}
+                    onChange={(e) => {
+                      setGrupoForm({ ...grupoForm, id: Number(e.target.value) })
+                      setGrupoId(grupoForm.id)
+                    }}
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                   >
                     <option disabled value="0">Selecione um grupo...</option>
@@ -534,14 +544,14 @@ export default function Grupos() {
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => setShowAddFishModal(false)}
+                    onClick={() => setShowAddPeixeModal(false)}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={() => {
-
+                      handleAddPeixe()
                     }}
                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md"
                   >

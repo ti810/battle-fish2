@@ -36,6 +36,6 @@ export const peixeSchema = z.object({
     .trim()
     .min(4, 'Nome do peixe está muito curto')
     .max(50, 'Nome do peixe está muito longo'),
-  tamanho: z.number().min(0.1, 'Tamanho de peixe tem que ser maior que 1 centimetro'),
-  peso: z.number().min(0.01, 'Peso do peixe precisa ser maior que 10 gramas')
+  tamanho: z.string().min(0.1, 'Tamanho de peixe tem que ser maior que 1 centimetro'),
+  peso: z.string().min(0.01, 'Peso do peixe precisa ser maior que 10 gramas')
 })
