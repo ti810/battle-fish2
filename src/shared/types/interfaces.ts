@@ -17,6 +17,7 @@ export interface UserCustomer {
 export interface NewMemberCustomer {
   nome: string
   grupo_id: number
+  criado_em: string
 }
 
 export interface MemberCustomer {
@@ -43,16 +44,16 @@ export interface GroupCustomer {
 export interface PeixeCustomer {
   id: number
   tipo: string
-  tamanho: number
-  peso: number
-  nome_membro: string
-  criado_em: number
+  tamanho: string
+  peso: string
+  id_grupo: number  
 }
 
 export interface NewPeixeCustomer {
   id: number
   tipo: string
-  tamanho: number
-  peso: number
-  id_membro: number
+  tamanho: string
+  peso: string
+  id_grupo: number
+  criado_em: string
 }

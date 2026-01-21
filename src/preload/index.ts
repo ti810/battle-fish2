@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewGroupCustomer, NewUserCustomer, NewPeixe, GroupCustomer } from '../shared/types/interfaces'
+import { NewGroupCustomer, NewUserCustomer, NewPeixeCustomer, GroupCustomer } from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -25,7 +25,7 @@ const api = {
   deletarGrupo: (id: number) => ipcRenderer.invoke('deletarGrupo', id),
   listarMembros: () => ipcRenderer.invoke('listarMembors'),
   ///Peixes
-  addNovoPeixe: (doc: NewPeixe) => ipcRenderer.invoke('addNovoPeixe', doc),
+  addNovoPeixe: (doc: NewPeixeCustomer) => ipcRenderer.invoke('addNovoPeixe', doc),
   listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
   listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
   deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id)
