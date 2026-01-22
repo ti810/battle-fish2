@@ -48,7 +48,7 @@ export class PeixeModel {
     return stmt.all() as PeixeCustomer[]
   }
 
-  buscarById(id: number): PeixeCustomer | null {
+  getById(id: number): PeixeCustomer | null {
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo
       FROM peixes p

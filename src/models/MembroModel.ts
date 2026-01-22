@@ -44,7 +44,7 @@ export class MembroModel {
     return stmt.all() as MemberCustomer[]
   }
 
-  buscarById(id: number): MemberCustomer | null {
+  getById(id: number): MemberCustomer | null {
     const stmt = this.db.prepare(`
       SELECT id, nome, grupo_id
       FROM membros
@@ -54,7 +54,38 @@ export class MembroModel {
     return (stmt.get(id) ?? null) as MemberCustomer | null
   }
 
-  deletar(id: number): boolean {
+  update(membro: MemberCustomer): boolean {
+    const fields: string[] = []
+    const values: unknown[] = []
+
+    if (membro.nome !== undefined) {
+      fields.push('nome = ?')
+      values.push(membro.nome)
+    }
+
+    if (membro.grupo_id !== undefined) {
+      fields.push('grupo_id = ?')
+      values.push(membro.grupo_id)
+    }
+
+    if (fields.length === 0) {
+      // nada para atualizar
+      return false
+    }
+
+    values.push(membro.id)
+
+    const stmt = this.db.prepare(`
+      UPDATE membros
+      SET ${fields.join(', ')}
+      WHERE id = ?
+    `)
+
+    const res = stmt.run(...values)
+    return res.changes > 0
+  }
+
+  delete(id: number): boolean {
     const stmt = this.db.prepare(`
       DELETE FROM membros
       WHERE id =?`)
