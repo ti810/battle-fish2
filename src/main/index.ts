@@ -18,6 +18,7 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
+    // fullscreen: true,
     autoHideMenuBar: true,
     ...(process.platform === 'linux'
       ? { icon: path.join(__dirname, '../../build/icon.png') }
@@ -37,16 +38,16 @@ function createWindow(): void {
     mainWindow.setIcon(iconPath)
   }
 
-  mainWindow.on('minimize', () => {
-    if (mainWindow) {
-      mainWindow.hide()
-    }
-  })
+  // mainWindow.on('minimize', () => {
+  //   if (mainWindow) {
+  //     mainWindow.hide()
+  //   }
+  // })
 
   mainWindow.on('ready-to-show', () => {
     if (mainWindow) {
       mainWindow.show()
-      createTray(mainWindow)
+      // createTray(mainWindow)
     }
   })
 

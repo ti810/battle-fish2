@@ -1,7 +1,8 @@
 import { ipcMain } from 'electron'
 import { GrupoModel } from '../models/GrupoModel'
 import DatabaseConstructor from 'better-sqlite3'
-import { NewGroupCustomer } from '../shared/types/interfaces'
+import { NewGroupCustomer, GroupCustomer } from '../shared/types/interfaces'
+import { success } from 'zod'
 
 export class GruposController {
   private model: GrupoModel
@@ -27,14 +28,51 @@ export class GruposController {
       }
     })
 
-    ipcMain.handle('addNovoGrupo', (_,doc: NewGroupCustomer) => {
+    ipcMain.handle('addNovoGrupo', (_, doc: NewGroupCustomer) => {
       try {
         return {
-          success: true, 
+          success: true,
           data: this.model.add(doc)
         }
       } catch (error) {
         console.error('Erro ao adcionar novo grupo:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('listarGrupoById', async (_event, id: number) => {
+      try {
+        // console.log(this.model.listar())
+        return {
+          success: true,
+          data: this.model.getById(id)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar grupo:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('editGrupoById', async (_, doc: GroupCustomer) => {
+      try {
+        return {
+          success: true,
+          data: this.model.edit(doc)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar grupo:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('deletarGrupo', async (_, id: number) => {
+      try {
+        return {
+          success: true,
+          data: this.model.delete(id)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar grupo:', error)
         throw error
       }
     })
