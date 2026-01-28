@@ -37,6 +37,18 @@ export class PeixesController {
       }
     })
 
+    ipcMain.handle('listarPeixeByGrupoId', (event, grupoId) => {
+      try {
+        return {
+          success: true,
+          data: this.model.listarByGrupoId(grupoId)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar peixe', error)
+        throw error
+      }
+    })
+
     ipcMain.handle('listarPeixeById', (event, id) => {
       try {
         return this.model.getById(id)
