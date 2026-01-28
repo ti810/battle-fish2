@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { PeixeModel } from '../models/PeixeModel'
 import DatabaseConstructor from 'better-sqlite3'
-import { NewPeixe } from '../shared/types/interfaces'
+import { NewPeixeCustomer } from '../shared/types/interfaces'
 import { peixeSchema } from '../renderer/src/hooks/formValidation'
 
 export class PeixesController {
@@ -25,7 +25,7 @@ export class PeixesController {
       }
     })
 
-    ipcMain.handle('addNovoPeixe', (_, doc: NewPeixe) => {
+    ipcMain.handle('addNovoPeixe', (_, doc: NewPeixeCustomer) => {
       try {
         return {
           success: true,
@@ -33,6 +33,18 @@ export class PeixesController {
         }
       } catch (error) {
         console.error('Erro ao adicionar novo grupo:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('listarPeixeByGrupoId', (event, grupoId) => {
+      try {
+        return {
+          success: true,
+          data: this.model.listarByGrupoId(grupoId)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar peixe', error)
         throw error
       }
     })

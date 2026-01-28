@@ -29,13 +29,13 @@ export default function Grupos() {
   const [showEditGroupModal, setShowEditGroupModal] = useState(false);
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
   const [grupos, setGrupos] = useState<GroupCustomer[]>([])
-  const [peixes, setPeixes] = useState<GroupCustomer[]>([])
+  const [peixes, setPeixes] = useState<PeixeCustomer[]>([])
   const [grupoId, setGrupoId] = useState<number | null>(null)
 
 
   // Form states
   const [grupoForm, setGrupoForm] = useState<NewGroupCustomer | GroupCustomer>({
-    id: Number(null as number | null),
+    id: Number("" as number | ""),
     nome: "",
     qtde_membros: 1,
     criado_em: agoraParaSQLite()
@@ -56,9 +56,6 @@ export default function Grupos() {
     qtde_membros: 1,
     criado_em: "",
   }
-
-
-  useEffect(() => { console.log(grupoForm) }, [grupoForm])
 
 
   // CRUD Grupo 
@@ -185,65 +182,31 @@ export default function Grupos() {
     }
   }
 
-  // CRUD Peixe 
+  const fetchListPeixesByGrupo = async (grupoId: number) => {
 
-  const handleAddPeixe = async () => {
     try {
 
-      const validationRules = formValidation(peixeSchema, peixeForm)
+      const res = window.api.listarPeixeByGrupoId(grupoId);
+      
+      if(res.){
 
-      if (!validationRules.success) {
-        setFieldErrors(validationRules.fieldErrors)
-        const firstField = Object.keys(validationRules.fieldErrors)[0]
-        if (firstField === "tipo") {
-          nomeRef.current?.focus()
-        }
-        toast.error(
-          <div className="space-y-1">
-            {Object.values(validationRules.fieldErrors).map((err, index) => (
-              <p key={index}>• {err}</p>
-            ))}
-          </div>
-        )
-
-        return
       }
-      setLoading(true)
-
-      const data = { ...peixeForm, id_grupo: Number(grupoId) }
-      setPeixeForm(data);
-
-      console.log(peixeForm)
-
-
-
-      // const res = await window.api.addNovoPeixe(peixeForm as NewPeixeCustomer)
-
-      // if (res.success) {
-      //   toast.success("Peixe salvo com sucesso")
-      //   // Limpar valores dos Inputs 
-      //   // setPeixeForm({
-
-      //   // })
-      //   setShowAddPeixeModal(false)
-
-      // }
-
 
     } catch (error) {
-      console.log("Erro ao salvar dados do Peixe", error)
-      toast.error(`Erro ao salvar dados do Peixe ${error}`)
-    } finally {
-      setLoading(false)
+      console.log("Erro ao listar Grupos", error)
+      toast.error(`Erro ao listar Grupos ${error}`)
+    } finally{
+
     }
 
-  };
+  }
 
   const fetchListGroup = async () => {
     try {
       setLoading(true)
 
       const res = await window.api.listarGrupos()
+
       if (res.success) {
         setGrupos(res.data)
       }
@@ -271,8 +234,65 @@ export default function Grupos() {
     }
   }
 
+  // CRUD Peixe 
+
+  const handleAddPeixe = async () => {
+    try {
+
+      const validationRules = formValidation(peixeSchema, peixeForm)
+
+      if (!validationRules.success) {
+        setFieldErrors(validationRules.fieldErrors)
+        const firstField = Object.keys(validationRules.fieldErrors)[0]
+        if (firstField === "tipo") {
+          nomeRef.current?.focus()
+        }
+        toast.error(
+          <div className="space-y-1">
+            {Object.values(validationRules.fieldErrors).map((err, index) => (
+              <p key={index}>• {err}</p>
+            ))}
+          </div>
+        )
+
+        return
+      }
+      setLoading(true)
+
+
+      const res = await window.api.addNovoPeixe(peixeForm as NewPeixeCustomer)
+
+      if (res.success) {
+        toast.success("Peixe salvo com sucesso")
+        // Limpar valores dos Inputs 
+        setPeixeForm({
+          id: Number(null as number | null),
+          tipo: "",
+          tamanho: "",
+          peso: "",
+          id_grupo: Number(null as number | null),
+          criado_em: ""
+        })
+        setShowAddPeixeModal(false)
+
+      }
+
+
+    } catch (error) {
+      console.log("Erro ao salvar dados do Peixe", error)
+      toast.error(`Erro ao salvar dados do Peixe ${error}`)
+    } finally {
+      setLoading(false)
+    }
+
+  };
+
+
+
+
   useEffect(() => {
     fetchListGroup()
+    fetchListPeixesByGrupo(1)
   }, [])
 
   useEffect(() => {
@@ -291,9 +311,13 @@ export default function Grupos() {
   }, [])
 
   useEffect(() => {
-    setGrupoId(grupoForm.id)
-  }, [grupoForm])
-
+    if (grupoId) {
+      setPeixeForm(prev => ({
+        ...prev,
+        id_grupo: grupoId
+      }))
+    }
+  }, [grupoId]);
 
   return (
     <>
@@ -461,14 +485,15 @@ export default function Grupos() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
 
                   <select
-                    value={grupoForm.id ?? null}
+                    value={grupoForm.id}
                     onChange={(e) => {
-                      setGrupoForm({ ...grupoForm, id: Number(e.target.value) })
-                      setGrupoId(grupoForm.id)
+                      const valor = Number(e.target.value)
+                      setGrupoForm({ ...grupoForm, id: valor })
+                      setGrupoId(valor)
                     }}
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                   >
-                    <option disabled value="0">Selecione um grupo...</option>
+                    <option disabled value={0}>Selecione um grupo...</option>
                     {grupos.map((grupo) => (
                       <option key={grupo.id} value={grupo.id}>{grupo.nome}</option>
                     ))}

@@ -8,6 +8,7 @@ import Database from 'better-sqlite3'
 import { UsuariosController } from '../controllers/UsuariosController'
 import { GruposController } from '../controllers/GruposController'
 import { MembrosController } from '../controllers/MembrosController'
+import { PeixesController } from '../controllers/PeixesController'
 const db = new Database('./src/database/app.db')
 
 let mainWindow: BrowserWindow | null = null
@@ -71,6 +72,7 @@ app.whenReady().then(() => {
   new UsuariosController(db)
   new GruposController(db)
   new MembrosController(db)
+  new PeixesController(db);
 
   electronApp.setAppUserModelId('com.electron')
 

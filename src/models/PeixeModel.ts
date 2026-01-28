@@ -41,12 +41,26 @@ export class PeixeModel {
       SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo, p.criado_em
       FROM peixes p
       JOIN grupos g ON p.id_grupo = g.id
-      WHERE p.deletado_em IS NULL
+      WHERE p.deletado_em IS NULL       
       ORDER BY p.criado_em DESC
     `)
 
     return stmt.all() as PeixeCustomer[]
   }
+
+  listarByGrupoId(grupoId: number): PeixeCustomer[] {
+    
+    const stmt = this.db.prepare(`
+      SELECT p.id, p.tipo, p.tamanho, p.peso
+      FROM peixes p    
+      WHERE p.deletado_em IS NULL
+       AND id_grupo = ?
+      ORDER BY p.criado_em DESC
+    `)
+
+    return stmt.all(grupoId) as PeixeCustomer[]
+  }
+
 
   buscarById(id: number): PeixeCustomer | null {
     const stmt = this.db.prepare(`
