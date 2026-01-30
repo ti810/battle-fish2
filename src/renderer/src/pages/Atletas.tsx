@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { UserPlus, Search, Edit2, Trash2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-interface Membro {
+interface Atleta {
   id: number
   name: string
   role: string
@@ -12,8 +12,8 @@ interface Membro {
   phone?: string
 }
 
-export default function Membros() {
-  const [members, setMembers] = useState<Membro[]>([
+export default function Atletas() {
+  const [members, setMembers] = useState<Atleta[]>([
     {
       id: 1,
       name: 'João Silva',
@@ -26,7 +26,7 @@ export default function Membros() {
     {
       id: 2,
       name: 'Pedro Santos',
-      role: 'Membro',
+      role: 'Atleta',
       group: 'Pescadores do Sul',
       email: 'pedro@email.com',
       status: 'Ativo',
@@ -44,7 +44,7 @@ export default function Membros() {
     {
       id: 4,
       name: 'Ana Souza',
-      role: 'Membro',
+      role: 'Atleta',
       group: 'Anzol de Ouro',
       email: 'ana@email.com',
       status: 'Ativo',
@@ -62,7 +62,7 @@ export default function Membros() {
   ])
 
   const [showModal, setShowModal] = useState(false)
-  const [editingMember, setEditingMember] = useState<Membro | null>(null)
+  const [editingMember, setEditingMember] = useState<Atleta | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   const [memberForm, setMemberForm] = useState({
@@ -70,13 +70,13 @@ export default function Membros() {
     email: '',
     phone: '',
     group: 'Pescadores do Sul',
-    role: 'Membro',
+    role: 'Atleta',
     status: 'Ativo'
   })
 
   const availableGroups = ['Pescadores do Sul', 'Anzol de Ouro', 'Maré Alta', 'Tubarões']
 
-  const handleOpenModal = (member?: Membro) => {
+  const handleOpenModal = (member?: Atleta) => {
     if (member) {
       setEditingMember(member)
       setMemberForm({
@@ -94,7 +94,7 @@ export default function Membros() {
         email: '',
         phone: '',
         group: 'Pescadores do Sul',
-        role: 'Membro',
+        role: 'Atleta',
         status: 'Ativo'
       })
     }
@@ -112,7 +112,7 @@ export default function Membros() {
     if (editingMember) {
       setMembers(members.map((m) => (m.id === editingMember.id ? { ...m, ...memberForm } : m)))
     } else {
-      const newMember: Membro = {
+      const newMember: Atleta = {
         id: members.length + 1,
         ...memberForm
       }
@@ -122,7 +122,7 @@ export default function Membros() {
   }
 
   const handleDeleteMember = (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este integrante?')) {
+    if (confirm('Tem certeza que deseja excluir este atleta?')) {
       setMembers(members.filter((m) => m.id !== id))
     }
   }
@@ -138,15 +138,15 @@ export default function Membros() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Integrantes</h1>
-          <p className="text-gray-500">Gerencie todos os participantes do campeonato</p>
+          <h1 className="text-2xl font-bold text-gray-900">Atletas</h1>
+          <p className="text-gray-500">Gerencie todos os atletas do campeonato</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
         >
           <UserPlus className="w-4 h-4" />
-          Adicionar Integrante
+          Adicionar Atleta
         </button>
       </div>
 
@@ -159,7 +159,7 @@ export default function Membros() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por nome, email ou grupo..."
+              placeholder="Buscar por nome, email ou equipe..."
               className="w-full pl-9 pr-4 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -170,8 +170,8 @@ export default function Membros() {
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
               <tr>
-                <th className="px-6 py-3">Participante</th>
-                <th className="px-6 py-3">Grupo</th>
+                <th className="px-6 py-3">Atleta</th>
+                <th className="px-6 py-3">Equipe</th>
                 <th className="px-6 py-3">Função</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3 text-right">Ações</th>
@@ -250,7 +250,7 @@ export default function Membros() {
         {/* Pagination */}
         <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
           <span>
-            Mostrando {filteredMembers.length} de {members.length} integrantes
+            Mostrando {filteredMembers.length} de {members.length} atletas
           </span>
         </div>
       </div>
@@ -268,7 +268,7 @@ export default function Membros() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <UserPlus className="w-6 h-6 text-blue-600" />
-                  {editingMember ? 'Editar Integrante' : 'Novo Integrante'}
+                  {editingMember ? 'Editar Integrante' : 'Novo Atleta'}
                 </h2>
                 <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600">
                   <X className="w-5 h-5" />
@@ -336,7 +336,7 @@ export default function Membros() {
                       onChange={(e) => setMemberForm({ ...memberForm, role: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                     >
-                      <option value="Membro">Membro</option>
+                      <option value="Atleta">Atleta</option>
                       <option value="Capitão">Capitão</option>
                     </select>
                   </div>

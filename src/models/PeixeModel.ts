@@ -14,24 +14,24 @@ export class PeixeModel {
       CREATE TABLE IF NOT EXISTS peixes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tipo TEXT NOT NULL,
-        tamanho FLOAT,
-        peso FLOAT, 
-        id_grupo INTEGER NOT NULL,      
+        tamanho REAL,
+        peso REAL, 
+        id_equipe INTEGER NOT NULL,      
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
         deletado_em TEXT,
-        FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE
+        FOREIGN KEY (id_equipe) REFERENCES equipes(id) ON DELETE CASCADE
       )
     `)
   }
 
   add(data: NewPeixeCustomer): number {
     const stmt = this.db.prepare(`
-      INSERT INTO peixes (tipo, tamanho, peso, id_grupo) 
+      INSERT INTO peixes (tipo, tamanho, peso, id_equipe) 
       VALUES (?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.tipo, data.tamanho, data.peso, data.id_grupo)
+    const res = stmt.run(data.tipo, data.tamanho, data.peso, data.id_equipe)
 
     return Number(res.lastInsertRowid)
   }
@@ -40,7 +40,7 @@ export class PeixeModel {
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo, p.criado_em
       FROM peixes p
-      JOIN grupos g ON p.id_grupo = g.id
+      JOIN equipes g ON p.id_equipe = g.id
       WHERE p.deletado_em IS NULL       
       ORDER BY p.criado_em DESC
     `)
@@ -48,13 +48,13 @@ export class PeixeModel {
     return stmt.all() as PeixeCustomer[]
   }
 
-  listarByGrupoId(grupoId: number): PeixeCustomer[] {
+  listarByEquipeId(grupoId: number): PeixeCustomer[] {
     
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso
       FROM peixes p    
       WHERE p.deletado_em IS NULL
-       AND id_grupo = ?
+       AND id_equipe = ?
       ORDER BY p.criado_em DESC
     `)
 
@@ -66,7 +66,7 @@ export class PeixeModel {
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo
       FROM peixes p
-      JOIN grupos g ON g.id = p.id_grupo
+      JOIN equipes g ON g.id = p.id_equipe
       WHERE p.id = ?
       ORDER by p.criado_em
     `)
