@@ -6,8 +6,8 @@ import { createTray } from './tray'
 
 import Database from 'better-sqlite3'
 import { UsuariosController } from '../controllers/UsuariosController'
-import { GruposController } from '../controllers/GruposController'
-import { MembrosController } from '../controllers/MembrosController'
+import { EquipesController } from '../controllers/EquipesController'
+import { AtletasController } from '../controllers/AtletasController'
 import { PeixesController } from '../controllers/PeixesController'
 const db = new Database('./src/database/app.db')
 
@@ -70,8 +70,8 @@ app.whenReady().then(() => {
   // const dbPath = path.join(__dirname, '..', 'database', 'app.db')
   // const db = new Database(dbPath)
   new UsuariosController(db)
-  new GruposController(db)
-  new MembrosController(db)
+  new EquipesController(db)
+  new AtletasController(db)
   new PeixesController(db);
 
   electronApp.setAppUserModelId('com.electron')

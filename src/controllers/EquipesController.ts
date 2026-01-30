@@ -1,21 +1,21 @@
 import { ipcMain } from 'electron'
-import { GrupoModel } from '../models/GrupoModel'
+import { EquipeModel } from '../models/GrupoModel'
 import DatabaseConstructor from 'better-sqlite3'
-import { NewGroupCustomer, GroupCustomer } from '../shared/types/interfaces'
+import { NewEquipeCustomer, EquipeCustomer } from '../shared/types/interfaces'
 import { success } from 'zod'
 
-export class GruposController {
-  private model: GrupoModel
+export class EquipesController {
+  private model: EquipeModel
   private db: InstanceType<typeof DatabaseConstructor>
 
   constructor(db: InstanceType<typeof DatabaseConstructor>) {
     this.db = db
-    this.model = new GrupoModel(db)
+    this.model = new EquipeModel(db)
     this.registrarRotas()
   }
 
   private registrarRotas() {
-    ipcMain.handle('listarGrupos', async () => {
+    ipcMain.handle('listarEquipes', async () => {
       try {
         // console.log(this.model.listar())
         return {
@@ -28,19 +28,19 @@ export class GruposController {
       }
     })
 
-    ipcMain.handle('addNovoGrupo', (_, doc: NewGroupCustomer) => {
+    ipcMain.handle('addNovoEquipe', (_, doc: NewEquipeCustomer) => {
       try {
         return {
           success: true,
           data: this.model.add(doc)
         }
       } catch (error) {
-        console.error('Erro ao adcionar novo grupo:', error)
+        console.error('Erro ao adicionar novo Equipe:', error)
         throw error
       }
     })
 
-    ipcMain.handle('listarGrupoById', async (_event, id: number) => {
+    ipcMain.handle('listarEquipeById', async (_event, id: number) => {
       try {
         // console.log(this.model.listar())
         return {
@@ -48,31 +48,31 @@ export class GruposController {
           data: this.model.getById(id)
         }
       } catch (error) {
-        console.error('Erro ao buscar grupo:', error)
+        console.error('Erro ao buscar Equipe:', error)
         throw error
       }
     })
 
-    ipcMain.handle('editGrupoById', async (_, doc: GroupCustomer) => {
+    ipcMain.handle('editEquipeById', async (_, doc: EquipeCustomer) => {
       try {
         return {
           success: true,
           data: this.model.edit(doc)
         }
       } catch (error) {
-        console.error('Erro ao buscar grupo:', error)
+        console.error('Erro ao buscar Equipe:', error)
         throw error
       }
     })
 
-    ipcMain.handle('deletarGrupo', async (_, id: number) => {
+    ipcMain.handle('deletarEquipe', async (_, id: number) => {
       try {
         return {
           success: true,
           data: this.model.delete(id)
         }
       } catch (error) {
-        console.error('Erro ao buscar grupo:', error)
+        console.error('Erro ao buscar Equipe:', error)
         throw error
       }
     })

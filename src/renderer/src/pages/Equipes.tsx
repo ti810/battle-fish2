@@ -2,15 +2,15 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Plus, Search, Fish, MoreVertical, Scale, Ruler, Users, Edit2, Trash2 } from 'lucide-react';
 import { findDimensionValueType, motion } from 'framer-motion';
 import { agoraParaSQLite } from '../lib/utils';
-import { NewGroupCustomer, GroupCustomer, PeixeCustomer, NewPeixeCustomer } from '~/src/shared/types/interfaces';
+import { NewEquipeCustomer, EquipeCustomer, PeixeCustomer, NewPeixeCustomer } from '~/src/shared/types/interfaces';
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
-import { grupoSchema, peixeSchema } from '../hooks/formValidation';
+import { equipeSchema, peixeSchema } from '../hooks/formValidation';
 import { Rifm } from 'rifm';
 
 
-export default function Grupos() {
+export default function Equipes() {
 
   const [openId, setOpenId] = useState(null)
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -25,19 +25,19 @@ export default function Grupos() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   const [showAddPeixeModal, setShowAddPeixeModal] = useState(false);
-  const [showAddGroupModal, setShowAddGroupModal] = useState(false);
-  const [showEditGroupModal, setShowEditGroupModal] = useState(false);
-  const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
-  const [grupos, setGrupos] = useState<GroupCustomer[]>([])
+  const [showAddEquipeModal, setShowAddEquipeModal] = useState(false);
+  const [showEditEquipeModal, setShowEditEquipeModal] = useState(false);
+  const [showDeleteEquipeModal, setShowDeleteEquipeModal] = useState(false);
+  const [equipes, setEquipes] = useState<EquipeCustomer[]>([])
   const [peixes, setPeixes] = useState<PeixeCustomer[]>([])
-  const [grupoId, setGrupoId] = useState<number | null>(null)
+  const [equipeId, setEquipeId] = useState<number | null>(null)
 
 
   // Form states
-  const [grupoForm, setGrupoForm] = useState<NewGroupCustomer | GroupCustomer>({
+  const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
     id: Number("" as number | ""),
     nome: "",
-    qtde_membros: 1,
+    qtde_atletas: 1,
     criado_em: agoraParaSQLite()
   });
 
@@ -46,24 +46,24 @@ export default function Grupos() {
     tipo: "",
     tamanho: "",
     peso: "",
-    id_grupo: Number(null as number | null),
+    id_equipe: Number(null as number | null),
     criado_em: agoraParaSQLite()
   });
 
-  const initialGrupoForm = {
+  const initialEquipeForm = {
     id: Number(null as number | null),
     nome: "",
-    qtde_membros: 1,
+    qtde_atletas: 1,
     criado_em: "",
   }
 
 
-  // CRUD Grupo 
+  // CRUD Equipe 
 
-  const handleEditGroup = async () => {
+  const handleEditEquipe = async () => {
     try {
 
-      const validationRules = formValidation(grupoSchema, grupoForm)
+      const validationRules = formValidation(equipeSchema, equipeForm)
 
       if (!validationRules.success) {
         setFieldErrors(validationRules.fieldErrors)
@@ -72,7 +72,7 @@ export default function Grupos() {
           nomeRef.current?.focus()
         }
 
-        if (firstField === "qtde_membros") {
+        if (firstField === "qtde_atletas") {
           qtdeRef.current?.focus()
         }
 
@@ -88,34 +88,34 @@ export default function Grupos() {
       }
       setLoading(true)
 
-      if (!grupoId) {
-        toast.error("Grupo não carregado")
+      if (!equipeId) {
+        toast.error("Equipe não carregado")
         return
       }
 
-      const res = await window.api.editGrupoById(grupoForm as GroupCustomer)
+      const res = await window.api.editEquipeById(equipeForm as EquipeCustomer)
 
       if (res.success) {
-        toast.success("Grupo salvo com sucesso")
+        toast.success("Equipe salvo com sucesso")
         // Limpar valores dos Inputs 
-        setGrupoForm(initialGrupoForm)
-        setShowEditGroupModal(false)
-        fetchListGroup()
+        setEquipeForm(initialEquipeForm)
+        setShowEditEquipeModal(false)
+        fetchListEquipe()
 
       }
 
     } catch (error) {
-      console.log("Erro ao salvar dados do Grupo", error)
-      toast.error(`Erro ao salvar dados do Grupo ${error}`)
+      console.log("Erro ao salvar dados do Equipe", error)
+      toast.error(`Erro ao salvar dados do Equipe ${error}`)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleAddGroup = async () => {
+  const handleAddEquipe = async () => {
     try {
 
-      const validationRules = formValidation(grupoSchema, grupoForm)
+      const validationRules = formValidation(equipeSchema, equipeForm)
 
       if (!validationRules.success) {
         setFieldErrors(validationRules.fieldErrors)
@@ -124,7 +124,7 @@ export default function Grupos() {
           nomeRef.current?.focus()
         }
 
-        if (firstField === "qtde_membros") {
+        if (firstField === "qtde_atletas") {
           qtdeRef.current?.focus()
         }
 
@@ -140,95 +140,95 @@ export default function Grupos() {
       }
       setLoading(true)
 
-      const res = await window.api.addNovoGrupo(grupoForm as NewGroupCustomer)
+      const res = await window.api.addNovoEquipe(equipeForm as NewEquipeCustomer)
 
       if (res.success) {
-        toast.success("Grupo salvo com sucesso")
+        toast.success("Equipe salvo com sucesso")
         // Limpar valores dos Inputs 
-        setGrupoForm(initialGrupoForm)
-        setShowAddGroupModal(false)
-        fetchListGroup()
+        setEquipeForm(initialEquipeForm)
+        setShowAddEquipeModal(false)
+        fetchListEquipe()
 
       }
 
 
     } catch (error) {
-      console.log("Erro ao salvar dados do Grupo", error)
-      toast.error(`Erro ao salvar dados do Grupo ${error}`)
+      console.log("Erro ao salvar dados do Equipe", error)
+      toast.error(`Erro ao salvar dados do Equipe ${error}`)
     } finally {
       setLoading(false)
     }
 
   };
 
-  const handleDeletarGroup = async () => {
+  const handleDeletarEquipe = async () => {
     try {
       setLoading(true)
 
-      const res = await window.api.deletarGrupo(Number(grupoId))
+      const res = await window.api.deletarEquipe(Number(equipeId))
       if (res.success) {
-        toast.success(`Grupo excluído com sucesso`)
-        setShowDeleteGroupModal(false)
-        fetchListGroup()
+        toast.success(`Equipe excluído com sucesso`)
+        setShowDeleteEquipeModal(false)
+        fetchListEquipe()
 
       }
 
     } catch (error) {
-      console.log("Erro ao listar Grupos", error)
-      toast.error(`Erro ao listar Grupos ${error}`)
+      console.log("Erro ao listar Equipes", error)
+      toast.error(`Erro ao listar Equipes ${error}`)
 
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchListPeixesByGrupo = async (grupoId: number) => {
+  const fetchListPeixesByEquipe = async (equipeId: number) => {
 
     try {
 
-      const res = window.api.listarPeixeByGrupoId(grupoId);
+      const res = await window.api.listarPeixeByEquipeId(equipeId);
       
-      if(res.){
+      if(res.data){
 
       }
 
     } catch (error) {
-      console.log("Erro ao listar Grupos", error)
-      toast.error(`Erro ao listar Grupos ${error}`)
+      console.log("Erro ao listar Equipes", error)
+      toast.error(`Erro ao listar Equipes ${error}`)
     } finally{
 
     }
 
   }
 
-  const fetchListGroup = async () => {
+  const fetchListEquipe = async () => {
     try {
       setLoading(true)
 
-      const res = await window.api.listarGrupos()
+      const res = await window.api.listarEquipes()
 
       if (res.success) {
-        setGrupos(res.data)
+        setEquipes(res.data)
       }
 
     } catch (error) {
-      console.log("Erro ao listar Grupos", error)
-      toast.error(`Erro ao listar Grupos ${error}`)
+      console.log("Erro ao listar Equipes", error)
+      toast.error(`Erro ao listar Equipes ${error}`)
     } finally {
       setLoading(false)
     }
 
   }
 
-  const getGroupId = async (id: number) => {
+  const getEquipeId = async (id: number) => {
     try {
-      const res = await window.api.listarGrupoById(id)
-      setGrupoForm(res.data)
-      setGrupoId(res.data.id)
+      const res = await window.api.listarEquipeById(id)
+      setEquipeForm(res.data)
+      setEquipeId(res.data.id)
 
     } catch (error) {
-      console.log("Erro ao carregar Grupo", error)
-      toast.error(`Erro ao carregar Grupo ${error}`)
+      console.log("Erro ao carregar Equipe", error)
+      toast.error(`Erro ao carregar Equipe ${error}`)
     } finally {
       setLoading(false)
     }
@@ -270,7 +270,7 @@ export default function Grupos() {
           tipo: "",
           tamanho: "",
           peso: "",
-          id_grupo: Number(null as number | null),
+          id_equipe: Number(null as number | null),
           criado_em: ""
         })
         setShowAddPeixeModal(false)
@@ -291,8 +291,8 @@ export default function Grupos() {
 
 
   useEffect(() => {
-    fetchListGroup()
-    fetchListPeixesByGrupo(1)
+    fetchListEquipe()
+    fetchListPeixesByEquipe(1)
   }, [])
 
   useEffect(() => {
@@ -311,13 +311,13 @@ export default function Grupos() {
   }, [])
 
   useEffect(() => {
-    if (grupoId) {
+    if (equipeId) {
       setPeixeForm(prev => ({
         ...prev,
-        id_grupo: grupoId
+        id_equipe: equipeId
       }))
     }
-  }, [grupoId]);
+  }, [equipeId]);
 
   return (
     <>
@@ -325,7 +325,7 @@ export default function Grupos() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Grupos de Pesca</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Equipes de Pesca</h1>
             <p className="text-gray-500">Gerencie as equipes do campeonato</p>
           </div>
           <div className="flex gap-2">
@@ -337,7 +337,7 @@ export default function Grupos() {
               Cadastrar Peixe
             </button>
             <button
-              onClick={() => setShowAddGroupModal(true)}
+              onClick={() => setShowAddEquipeModal(true)}
               className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
             >
               <Users className="w-4 h-4" />
@@ -352,72 +352,72 @@ export default function Grupos() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar grupos..."
+              placeholder="Buscar equipes..."
               className="w-full pl-9 pr-4 py-2 bg-gray-50 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
             />
           </div>
         </div>
 
-        {/* Groups Grid */}
+        {/* Equipes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {grupos.map((grupo, idx) => (
+          {equipes.map((equipe, idx) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              key={grupo.id}
-              className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
+              key={equipe.id}
+              className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow Equipe"
             >
               <div className="flex gap-3 justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-                    {grupo.nome.charAt(0)}
+                    {equipe.nome.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{grupo.nome}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${grupo.ativo === 1 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {grupo.ativo === 1 ? "ATIVO" : "INATIVO"}
+                    <h3 className="font-semibold text-gray-900">{equipe.nome}</h3>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${equipe.ativo === 1 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {equipe.ativo === 1 ? "ATIVO" : "INATIVO"}
                     </span>
                   </div>
                 </div>
                 <div className='bg-white relative'>
-                  <div key={grupo.id} className="right-0 absolute flex flex-col items-end">
-                    <button onClick={() => toggleMenu(grupo.id)} type='button' className="text-gray-400 hover:text-gray-600">
+                  <div key={equipe.id} className="right-0 absolute flex flex-col items-end">
+                    <button onClick={() => toggleMenu(equipe.id)} type='button' className="text-gray-400 hover:text-gray-600">
                       <MoreVertical className="w-5 h-5" />
                     </button>
-                    {grupo.id === openId && (
+                    {equipe.id === openId && (
                       <div ref={dropdownRef} className={`dropdown-menu active float-right text-gray-500 bg-white drop-shadow-lg drop-shadow-gray-700 rounded-[5px] text-left`}>
                         <button type='button' onClick={() => {
-                          setShowEditGroupModal(true)
-                          getGroupId(grupo.id)
+                          setShowEditEquipeModal(true)
+                          getEquipeId(equipe.id)
                         }} className='w-full px-4 py-2 rounded-tl-[5px] rounded-tr-[5px] hover:bg-gray-300 flex flex-row text-blue-600'><Edit2 className="w-5 h-5" />&nbsp;&nbsp;Editar</button>
                         <button type='button' onClick={() => {
-                          setShowDeleteGroupModal(true)
-                          getGroupId(grupo.id)
+                          setShowDeleteEquipeModal(true)
+                          getEquipeId(equipe.id)
                         }} className='w-full px-4 py-2 rounded-bl-[5px] rounded-br-[5px] hover:bg-gray-300 flex flex-row text-red-600'><Trash2 className="w-5 h-5" />&nbsp;&nbsp;Deletar</button>
                       </div>
                     )}
                   </div>
-                  {/* <div key={grupo.id} className="right-0 absolute flex flex-col items-end">
+                  {/* <div key={equipe.id} className="right-0 absolute flex flex-col items-end">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleMenu(grupo.id);
+                        toggleMenu(equipe.id);
                       }}
                       className="text-gray-400 hover:text-gray-600"
                     >
                       <MoreVertical className="w-5 h-5" />
                     </button>
 
-                    {grupo.id === openId && (
+                    {equipe.id === openId && (
                       <div
                         className="dropdown-menu active float-right text-gray-500 bg-white drop-shadow-lg rounded-[5px] text-left"
                       >
                         <button
                           type="button"
                           onClick={() => {
-                            setShowEditGroupModal(true);
+                            setShowEditEquipeModal(true);
                           }}
                           className="w-full px-4 py-2 rounded-tl-[5px] rounded-tr-[5px] hover:bg-gray-300 flex flex-row"
                         >
@@ -428,7 +428,7 @@ export default function Grupos() {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowDeleteGroupModal(true);
+                            setShowDeleteEquipeModal(true);
                           }}
                           className="w-full px-4 py-2 rounded-bl-[5px] rounded-br-[5px] hover:bg-gray-300 flex flex-row"
                         >
@@ -445,20 +445,20 @@ export default function Grupos() {
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <div className="bg-gray-50 p-2 rounded-lg text-center">
                   <p className="text-xs text-gray-500">Integrantes</p>
-                  <p className="font-semibold text-gray-900">{grupo.qtde_membros}</p>
+                  <p className="font-semibold text-gray-900">{equipe.qtde_atletas}</p>
                 </div>
                 <div className="bg-gray-50 p-2 rounded-lg text-center">
                   <p className="text-xs text-gray-500">Capturas</p>
-                  {/* <p className="font-semibold text-blue-600">{grupo.catches}</p> VER DEPOIS */}
+                  {/* <p className="font-semibold text-blue-600">{equipe.catches}</p> VER DEPOIS */}
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-50">
-                {/* <span>Última captura: {grupo.lastCatch}</span> VER DEPOIS */}
+                {/* <span>Última captura: {equipe.lastCatch}</span> VER DEPOIS */}
 
                 <button
                   onClick={() => null}
-                  className="text-blue-600 hover:text-blue-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                  className="text-blue-600 hover:text-blue-700 font-medium opacity-0 Equipe-hover:opacity-100 transition-opacity flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   Adicionar Peixe
@@ -482,25 +482,25 @@ export default function Grupos() {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Equipe</label>
 
                   <select
-                    value={grupoForm.id}
+                    value={equipeForm.id}
                     onChange={(e) => {
                       const valor = Number(e.target.value)
-                      setGrupoForm({ ...grupoForm, id: valor })
-                      setGrupoId(valor)
+                      setEquipeForm({ ...equipeForm, id: valor })
+                      setEquipeId(valor)
                     }}
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                   >
-                    <option disabled value={0}>Selecione um grupo...</option>
-                    {grupos.map((grupo) => (
-                      <option key={grupo.id} value={grupo.id}>{grupo.nome}</option>
+                    <option disabled value={0}>Selecione um equipe...</option>
+                    {equipes.map((equipe) => (
+                      <option key={equipe.id} value={equipe.id}>{equipe.nome}</option>
                     ))}
                   </select>
 
 
-                  {/* {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)} */}
+                  {/* {Equipes.map(g => <option key={g.id} value={g.id}>{g.name}</option>)} */}
 
                 </div>
                 <div>
@@ -588,8 +588,8 @@ export default function Grupos() {
           </div>
         )}
 
-        {/* Add Group Modal */}
-        {showAddGroupModal && (
+        {/* Add Equipe Modal */}
+        {showAddEquipeModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -606,10 +606,10 @@ export default function Grupos() {
                   <input
                     type="text"
                     ref={nomeRef}
-                    value={grupoForm.nome}
+                    value={equipeForm.nome}
                     onChange={
                       (e) => {
-                        setGrupoForm({ ...grupoForm, nome: e.target.value })
+                        setEquipeForm({ ...equipeForm, nome: e.target.value })
                         setFieldErrors((prev) => {
                           const { nome, ...rest } = prev
                           return rest
@@ -625,28 +625,28 @@ export default function Grupos() {
                   <input
                     type="number"
                     ref={qtdeRef}
-                    value={grupoForm.qtde_membros}
+                    value={equipeForm.qtde_atletas}
                     onChange={(e) => {
-                      setGrupoForm({ ...grupoForm, qtde_membros: Number(e.target.value) })
+                      setEquipeForm({ ...equipeForm, qtde_atletas: Number(e.target.value) })
                       setFieldErrors((prev) => {
-                        const { qtde_membros, ...rest } = prev
+                        const { qtde_atletas, ...rest } = prev
                         return rest
                       })
                     }}
-                    className={`${fieldErrors.qtde_membros ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    className={`${fieldErrors.qtde_atletas ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="1"
                     min="1"
                   />
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => setShowAddGroupModal(false)}
+                    onClick={() => setShowAddEquipeModal(false)}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
-                    onClick={handleAddGroup}
+                    onClick={handleAddEquipe}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
                   >
                     Criar Equipe
@@ -657,8 +657,8 @@ export default function Grupos() {
           </div>
         )}
 
-        {/* Edit Grupo Modal  */}
-        {showEditGroupModal && (
+        {/* Edit Equipe Modal  */}
+        {showEditEquipeModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -675,10 +675,10 @@ export default function Grupos() {
                   <input
                     type="text"
                     ref={nomeRef}
-                    value={grupoForm.nome}
+                    value={equipeForm.nome}
                     onChange={
                       (e) => {
-                        setGrupoForm({ ...grupoForm, nome: e.target.value })
+                        setEquipeForm({ ...equipeForm, nome: e.target.value })
                         setFieldErrors((prev) => {
                           const { nome, ...rest } = prev
                           return rest
@@ -694,28 +694,28 @@ export default function Grupos() {
                   <input
                     type="number"
                     ref={qtdeRef}
-                    value={grupoForm.qtde_membros}
+                    value={equipeForm.qtde_atletas}
                     onChange={(e) => {
-                      setGrupoForm({ ...grupoForm, qtde_membros: Number(e.target.value) })
+                      setEquipeForm({ ...equipeForm, qtde_atletas: Number(e.target.value) })
                       setFieldErrors((prev) => {
-                        const { qtde_membros, ...rest } = prev
+                        const { qtde_atletas, ...rest } = prev
                         return rest
                       })
                     }}
-                    className={`${fieldErrors.qtde_membros ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    className={`${fieldErrors.qtde_atletas ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="1"
                     min="1"
                   />
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => setShowEditGroupModal(false)}
+                    onClick={() => setShowEditEquipeModal(false)}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
-                    onClick={handleEditGroup}
+                    onClick={handleEditEquipe}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
                   >
                     Editar Equipe
@@ -725,7 +725,7 @@ export default function Grupos() {
             </motion.div>
           </div>
         )}
-        {showDeleteGroupModal && (
+        {showDeleteEquipeModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -739,18 +739,18 @@ export default function Grupos() {
 
               <div className='bg-amber-100 w-full rounded-md p-1 text-left'>
                 <span className='text-[20px] ml-4'>Nome: </span>
-                <span className='text-red-500 font-bold text-[24px]'>  {grupoForm.nome}</span>
+                <span className='text-red-500 font-bold text-[24px]'>  {equipeForm.nome}</span>
               </div>
               <div className="space-y-4">
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => setShowDeleteGroupModal(false)}
+                    onClick={() => setShowDeleteEquipeModal(false)}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
-                    onClick={handleDeletarGroup}
+                    onClick={handleDeletarEquipe}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
                   >
                     Confirmar deleção

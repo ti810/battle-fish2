@@ -9,8 +9,8 @@ import logo from '../assets/images/logo.png'
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
     { to: '/', icon: Trophy, label: 'Ranking' },
-    { to: '/grupos', icon: Fish, label: 'Grupos' },
-    { to: '/membros', icon: Users, label: 'Integrantes' },
+    { to: '/equipes', icon: Fish, label: 'Equipes' },
+    { to: '/atletas', icon: Users, label: 'Atletas' },
     { to: '/usuarios', icon: UserCircle, label: 'Usuários' }
   ]
 
