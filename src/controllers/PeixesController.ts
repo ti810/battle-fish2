@@ -37,11 +37,11 @@ export class PeixesController {
       }
     })
 
-    ipcMain.handle('listarPeixeByEquipeId', (event, grupoId) => {
+    ipcMain.handle('listarPeixeByEquipeId', (event, equipeId) => {
       try {
         return {
           success: true,
-          data: this.model.listarByEquipeId(grupoId)
+          data: this.model.listarByEquipeId(equipeId)
         }
       } catch (error) {
         console.error('Erro ao buscar peixe', error)

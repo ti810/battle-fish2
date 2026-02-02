@@ -28,7 +28,7 @@ export class EquipesController {
       }
     })
 
-    ipcMain.handle('addNovoEquipe', (_, doc: NewEquipeCustomer) => {
+    ipcMain.handle('addNovaEquipe', (_, doc: NewEquipeCustomer) => {
       try {
         return {
           success: true,
@@ -49,6 +49,19 @@ export class EquipesController {
         }
       } catch (error) {
         console.error('Erro ao buscar Equipe:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('listarEquipesComUltimaCaptura', async () => {
+      try {
+        // console.log(this.model.listar())
+        return {
+          success: true,
+          data: this.model.listarComUltimaCapturaOfPeixe()
+        }
+      } catch (error) {
+        console.error('Erro ao listar membors:', error)
         throw error
       }
     })

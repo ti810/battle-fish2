@@ -48,8 +48,7 @@ export class PeixeModel {
     return stmt.all() as PeixeCustomer[]
   }
 
-  listarByEquipeId(grupoId: number): PeixeCustomer[] {
-    
+  listarByEquipeId(equipeId: number): PeixeCustomer[] {
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso
       FROM peixes p    
@@ -58,9 +57,9 @@ export class PeixeModel {
       ORDER BY p.criado_em DESC
     `)
 
-    return stmt.all(grupoId) as PeixeCustomer[]
+    return stmt.all(equipeId) as PeixeCustomer[]
   }
-
+  
 
   buscarById(id: number): PeixeCustomer | null {
     const stmt = this.db.prepare(`

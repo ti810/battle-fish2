@@ -1,5 +1,5 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { EquipeCustomer, NewEquipeCustomer } from '../shared/types/interfaces'
+import { EquipeCustomer, NewEquipeCustomer, PeixeCustomer } from '../shared/types/interfaces'
 import z from 'zod'
 
 export class EquipeModel {
@@ -15,7 +15,7 @@ export class EquipeModel {
       CREATE TABLE IF NOT EXISTS equipes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        setor INTEGER NOT NULL,
+        setor INTERGER NOT NULL,
         qtde_atletas INTEGER NOT NULL,
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -27,7 +27,7 @@ export class EquipeModel {
 
   listar(): EquipeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, setor, ativo, qtde_atletas, criado_em
+      SELECT id, nome, ativo, qtde_atletas, criado_em
       FROM equipes
       WHERE deletado_em IS NULL
       ORDER BY criado_em DESC
@@ -36,9 +36,28 @@ export class EquipeModel {
     return stmt.all() as EquipeCustomer[]
   }
 
+  listarComUltimaCapturaOfPeixe() {
+    const stmt = this.db.prepare(`
+    SELECT 
+      e.id,
+      e.nome,
+      e.ativo,
+      e.qtde_atletas,
+      e.criado_em,
+      MAX(p.criado_em) AS ultima_captura
+    FROM equipes e
+    LEFT JOIN peixes p 
+      ON p.id_equipe = e.id 
+     AND p.deletado_em IS NULL
+    GROUP BY e.id
+  `)
+
+    return stmt.all()
+  }
+
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT id, nome, setor, ativo, qtde_atletas, criado_em
+      SELECT id, nome, ativo, qtde_atletas, criado_em
       FROM equipes
       WHERE deletado_em IS NULL
         AND id = ?
@@ -51,11 +70,11 @@ export class EquipeModel {
   edit(data: EquipeCustomer): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       UPDATE equipes
-      SET nome = ?, setor=?, qtde_atletas = ?     
+      SET nome = ?, qtde_atletas = ?      
       WHERE id = ?      
     `)
 
-    const result = stmt.run(data.nome,data.setor, data.qtde_atletas, data.id)
+    const result = stmt.run(data.nome, data.qtde_atletas, data.id)
     if (result.changes === 0) {
       return null
     }
@@ -65,14 +84,14 @@ export class EquipeModel {
 
   add(data: NewEquipeCustomer): NewEquipeCustomer {
     const stmt = this.db.prepare(`
-      INSERT INTO equipes (nome, setor, ativo, criado_em, qtde_atletas) 
+      INSERT INTO equipes (nome, ativo, setor, criado_em, qtde_atletas) 
       VALUES (?, ?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.nome, data.setor, data.ativo ?? 1, data.criado_em, data.qtde_atletas)
+    const res = stmt.run(data.nome, data.ativo ?? 1, data.setor, data.criado_em, data.qtde_atletas)
 
     const select = this.db.prepare(`
-      SELECT id, nome, setor, ativo, criado_em, qtde_atletas
+      SELECT id, nome, ativo, setor, criado_em, qtde_atletas
       FROM equipes
       WHERE id = ?
     `)

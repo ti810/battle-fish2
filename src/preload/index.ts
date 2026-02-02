@@ -18,8 +18,9 @@ const api = {
   addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
   //Equipes
-  addNovoEquipe: (doc: NewEquipeCustomer) => ipcRenderer.invoke('addNovoEquipe', doc),
+  addNovaEquipe: (doc: NewEquipeCustomer) => ipcRenderer.invoke('addNovaEquipe', doc),
   listarEquipes: () => ipcRenderer.invoke('listarEquipes'),
+  listarEquipesComUltimaCaptura: () => ipcRenderer.invoke('listarEquipesComUltimaCaptura'),
   listarEquipeById: (id: number) => ipcRenderer.invoke('listarEquipeById', id),
   editEquipeById: (doc: EquipeCustomer) => ipcRenderer.invoke('editEquipeById', doc),
   deletarEquipe: (id: number) => ipcRenderer.invoke('deletarEquipe', id),
