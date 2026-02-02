@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { EquipeModel } from '../models/GrupoModel'
+import { EquipeModel } from '../models/EquipeModel'
 import DatabaseConstructor from 'better-sqlite3'
 import { NewEquipeCustomer, EquipeCustomer } from '../shared/types/interfaces'
 import { success } from 'zod'

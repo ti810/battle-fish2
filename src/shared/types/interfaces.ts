@@ -29,6 +29,7 @@ export interface AtletaCustomer {
 export interface NewEquipeCustomer {
   id: number
   nome: string
+  setor: number
   ativo?: number
   qtde_atletas: number
   criado_em: string
@@ -37,6 +38,7 @@ export interface NewEquipeCustomer {
 export interface EquipeCustomer {
   id: number
   nome: string
+  setor:number
   ativo?: number
   qtde_atletas: number
 }

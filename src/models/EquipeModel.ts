@@ -15,7 +15,7 @@ export class EquipeModel {
       CREATE TABLE IF NOT EXISTS equipes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        setor INTERGER NOT NULL,
+        setor INTEGER NOT NULL,
         qtde_atletas INTEGER NOT NULL,
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -27,7 +27,7 @@ export class EquipeModel {
 
   listar(): EquipeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_atletas, criado_em
+      SELECT id, nome, setor, ativo, qtde_atletas, criado_em
       FROM equipes
       WHERE deletado_em IS NULL
       ORDER BY criado_em DESC
@@ -38,7 +38,7 @@ export class EquipeModel {
 
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_atletas, criado_em
+      SELECT id, nome, setor, ativo, qtde_atletas, criado_em
       FROM equipes
       WHERE deletado_em IS NULL
         AND id = ?
@@ -51,11 +51,11 @@ export class EquipeModel {
   edit(data: EquipeCustomer): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       UPDATE equipes
-      SET nome = ?, qtde_atletas = ?      
+      SET nome = ?, setor=?, qtde_atletas = ?     
       WHERE id = ?      
     `)
 
-    const result = stmt.run(data.nome, data.qtde_atletas, data.id)
+    const result = stmt.run(data.nome,data.setor, data.qtde_atletas, data.id)
     if (result.changes === 0) {
       return null
     }
@@ -65,14 +65,14 @@ export class EquipeModel {
 
   add(data: NewEquipeCustomer): NewEquipeCustomer {
     const stmt = this.db.prepare(`
-      INSERT INTO equipes (nome, ativo, criado_em, qtde_atletas) 
-      VALUES (?, ?, ?, ?)
+      INSERT INTO equipes (nome, setor, ativo, criado_em, qtde_atletas) 
+      VALUES (?, ?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.nome, data.ativo ?? 1, data.criado_em, data.qtde_atletas)
+    const res = stmt.run(data.nome, data.setor, data.ativo ?? 1, data.criado_em, data.qtde_atletas)
 
     const select = this.db.prepare(`
-      SELECT id, nome, ativo, criado_em, qtde_atletas
+      SELECT id, nome, setor, ativo, criado_em, qtde_atletas
       FROM equipes
       WHERE id = ?
     `)
