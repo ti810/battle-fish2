@@ -63,16 +63,17 @@ export class EquipeModel {
     return this.getById(data.id)
   }
 
-  add(data: NewEquipeCustomer): NewEquipeCustomer {
+  add(data: NewEquipeCustomer): NewEquipeCustomer {   
+ 
     const stmt = this.db.prepare(`
-      INSERT INTO equipes (nome, ativo, criado_em, qtde_atletas) 
-      VALUES (?, ?, ?, ?)
+      INSERT INTO equipes (nome, ativo, setor, criado_em, qtde_atletas) 
+      VALUES (?, ?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.nome, data.ativo ?? 1, data.criado_em, data.qtde_atletas)
+    const res = stmt.run(data.nome, data.ativo ?? 1, data.setor, data.criado_em, data.qtde_atletas)
 
     const select = this.db.prepare(`
-      SELECT id, nome, ativo, criado_em, qtde_atletas
+      SELECT id, nome, ativo, setor, criado_em, qtde_atletas
       FROM equipes
       WHERE id = ?
     `)

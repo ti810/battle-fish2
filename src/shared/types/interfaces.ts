@@ -27,33 +27,27 @@ export interface AtletaCustomer {
 }
 
 export interface NewEquipeCustomer {
-  id: number
   nome: string
   ativo?: number
   qtde_atletas: number
+  setor: number
   criado_em: string
+  atualizado_em?: string
+  deletado_em?: string
 }
 
-export interface EquipeCustomer {
+export interface EquipeCustomer extends NewEquipeCustomer {
   id: number
-  nome: string
-  ativo?: number
-  qtde_atletas: number
-}
-
-export interface PeixeCustomer {
-  id: number
-  tipo: string
-  tamanho: string
-  peso: string
-  id_equipe: number  
 }
 
 export interface NewPeixeCustomer {
-  id: number
   tipo: string
   tamanho: string
   peso: string
   id_equipe: number
   criado_em: string
+}
+
+export interface PeixeCustomer extends NewPeixeCustomer {
+  id: number
 }

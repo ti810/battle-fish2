@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { AtletaModel } from '../models/MembroModel'
+import { AtletaModel } from '../models/AtletaModel'
 import DatabaseConstructor from 'better-sqlite3'
 
 export class AtletasController {

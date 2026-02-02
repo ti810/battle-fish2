@@ -8,6 +8,7 @@ import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
 import { equipeSchema, peixeSchema } from '../hooks/formValidation';
 import { Rifm } from 'rifm';
+import { preview } from 'vite';
 
 
 export default function Equipes() {
@@ -21,6 +22,7 @@ export default function Equipes() {
   const [loading, setLoading] = useState(false);
 
   const nomeRef = useRef<HTMLInputElement>(null)
+  const setorRef = useRef<HTMLInputElement>(null)
   const qtdeRef = useRef<HTMLInputElement>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
@@ -28,21 +30,21 @@ export default function Equipes() {
   const [showAddEquipeModal, setShowAddEquipeModal] = useState(false);
   const [showEditEquipeModal, setShowEditEquipeModal] = useState(false);
   const [showDeleteEquipeModal, setShowDeleteEquipeModal] = useState(false);
-  const [equipes, setEquipes] = useState<EquipeCustomer[]>([])
-  const [peixes, setPeixes] = useState<PeixeCustomer[]>([])
+  const [equipes, setEquipes] = useState<EquipeCustomer[]>([]);
+  const [contagemPeixes, setContagemPeixes] = useState<Record<number, number>>({});
+
   const [equipeId, setEquipeId] = useState<number | null>(null)
 
 
   // Form states
   const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
-    id: Number("" as number | ""),
     nome: "",
     qtde_atletas: 1,
-    criado_em: agoraParaSQLite()
+    setor: 1,
+    criado_em: agoraParaSQLite(),
   });
 
   const [peixeForm, setPeixeForm] = useState<NewPeixeCustomer | PeixeCustomer>({
-    id: Number(null as number | null),
     tipo: "",
     tamanho: "",
     peso: "",
@@ -53,6 +55,7 @@ export default function Equipes() {
   const initialEquipeForm = {
     id: Number(null as number | null),
     nome: "",
+    setor: Number(null as number | null),
     qtde_atletas: 1,
     criado_em: "",
   }
@@ -138,9 +141,10 @@ export default function Equipes() {
 
         return
       }
-      setLoading(true)
 
-      const res = await window.api.addNovoEquipe(equipeForm as NewEquipeCustomer)
+
+      const res = await window.api.addNovaEquipe(equipeForm as NewEquipeCustomer)
+
 
       if (res.success) {
         toast.success("Equipe salvo com sucesso")
@@ -180,25 +184,6 @@ export default function Equipes() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fetchListPeixesByEquipe = async (equipeId: number) => {
-
-    try {
-
-      const res = await window.api.listarPeixeByEquipeId(equipeId);
-      
-      if(res.data){
-
-      }
-
-    } catch (error) {
-      console.log("Erro ao listar Equipes", error)
-      toast.error(`Erro ao listar Equipes ${error}`)
-    } finally{
-
-    }
-
   }
 
   const fetchListEquipe = async () => {
@@ -287,12 +272,34 @@ export default function Equipes() {
 
   };
 
+  const carregarDados = async () => {
+    const res = await window.api.listarEquipes();
+
+    if (res.success) {
+      setEquipes(res.data);
+
+      const resultados = await Promise.all(
+        res.data.map((equipe: { id: number; }) =>
+          window.api.listarPeixeByEquipeId(equipe.id)
+        )
+      );
+
+      const contagens: Record<number, number> = {};
+
+      resultados.forEach((r, index) => {
+        contagens[res.data[index].id] = r.success ? r.data.length : 0;
+      });
+
+      setContagemPeixes(contagens);
+    }
+  };
+
 
 
 
   useEffect(() => {
-    fetchListEquipe()
-    fetchListPeixesByEquipe(1)
+    // fetchListEquipe()
+    carregarDados()
   }, [])
 
   useEffect(() => {
@@ -449,7 +456,7 @@ export default function Equipes() {
                 </div>
                 <div className="bg-gray-50 p-2 rounded-lg text-center">
                   <p className="text-xs text-gray-500">Capturas</p>
-                  {/* <p className="font-semibold text-blue-600">{equipe.catches}</p> VER DEPOIS */}
+                  <p className="font-semibold text-blue-600">{contagemPeixes[equipe.id] ?? "Adcionar peixe"}</p>
                 </div>
               </div>
 
@@ -485,7 +492,7 @@ export default function Equipes() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Equipe</label>
 
                   <select
-                    value={equipeForm.id}
+                    value={Number(equipeId)}
                     onChange={(e) => {
                       const valor = Number(e.target.value)
                       setEquipeForm({ ...equipeForm, id: valor })
@@ -634,6 +641,24 @@ export default function Equipes() {
                       })
                     }}
                     className={`${fieldErrors.qtde_atletas ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    placeholder="1"
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Setor? <span className='text-red-600'>*</span></label>
+                  <input
+                    type="number"
+                    ref={setorRef}
+                    value={equipeForm.setor}
+                    onChange={(e) => {
+                      setEquipeForm({ ...equipeForm, setor: Number(e.target.value) })
+                      setFieldErrors((prev) => {
+                        const { setor, ...rest } = prev
+                        return rest
+                      })
+                    }}
+                    className={`${fieldErrors.setor ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="1"
                     min="1"
                   />
