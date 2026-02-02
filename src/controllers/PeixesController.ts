@@ -32,16 +32,16 @@ export class PeixesController {
           data: this.model.add(doc)
         }
       } catch (error) {
-        console.error('Erro ao adicionar novo grupo:', error)
+        console.error('Erro ao adicionar novo membro:', error)
         throw error
       }
     })
 
-    ipcMain.handle('listarPeixeByGrupoId', (event, grupoId) => {
+    ipcMain.handle('listarPeixeByEquipeId', (event, grupoId) => {
       try {
         return {
           success: true,
-          data: this.model.listarByGrupoId(grupoId)
+          data: this.model.listarByEquipeId(grupoId)
         }
       } catch (error) {
         console.error('Erro ao buscar peixe', error)

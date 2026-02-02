@@ -14,31 +14,31 @@ export interface UserCustomer {
   criado_em: string
 }
 
-export interface NewMemberCustomer {
+export interface NewAtletaCustomer {
   nome: string
-  grupo_id: number
+  equipe_id: number
   criado_em: string
 }
 
-export interface MemberCustomer {
+export interface AtletaCustomer {
   id: number
-  nome: string
-  grupo_id: number
+  nome?: string
+  equipe_id?: number
 }
 
-export interface NewGroupCustomer {
+export interface NewEquipeCustomer {
   id: number
   nome: string
   ativo?: number
-  qtde_membros: number
+  qtde_atletas: number
   criado_em: string
 }
 
-export interface GroupCustomer {
+export interface EquipeCustomer {
   id: number
   nome: string
   ativo?: number
-  qtde_membros: number
+  qtde_atletas: number
 }
 
 export interface PeixeCustomer {
@@ -46,7 +46,7 @@ export interface PeixeCustomer {
   tipo: string
   tamanho: string
   peso: string
-  id_grupo: number  
+  id_equipe: number  
 }
 
 export interface NewPeixeCustomer {
@@ -54,6 +54,6 @@ export interface NewPeixeCustomer {
   tipo: string
   tamanho: string
   peso: string
-  id_grupo: number
+  id_equipe: number
   criado_em: string
 }

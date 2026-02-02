@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Membros from './pages/Membros'
+import Atletas from './pages/Atletas'
 import Layout from './components/Layout'
-import Grupos from './pages/Grupos'
+import Grupos from './pages/Equipes'
 import Usuarios from './pages/Usuarios'
 import Ranking from './pages/Ranking'
 import Login from './pages/Login'
@@ -26,8 +26,8 @@ export default function App(): React.JSX.Element {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Ranking />} />
-            <Route path="/membros" element={<Membros />} />
-            <Route path="/grupos" element={<Grupos />} />
+            <Route path="/atletas" element={<Atletas />} />
+            <Route path="/equipes" element={<Grupos />} />
             <Route path="/usuarios" element={<Usuarios />} />
           </Route>
         </Routes>

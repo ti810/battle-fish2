@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewGroupCustomer, NewUserCustomer, NewPeixeCustomer, GroupCustomer } from '../shared/types/interfaces'
+import { NewEquipeCustomer, NewUserCustomer, NewPeixeCustomer, EquipeCustomer } from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -17,19 +17,19 @@ const api = {
   logout: () => ipcRenderer.invoke('app:logout'),
   addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
   listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
-  //Grupos
-  addNovoGrupo: (doc: NewGroupCustomer) => ipcRenderer.invoke('addNovoGrupo', doc),
-  listarGrupos: () => ipcRenderer.invoke('listarGrupos'),
-  listarGrupoById: (id: number) => ipcRenderer.invoke('listarGrupoById', id),
-  editGrupoById: (doc: GroupCustomer) => ipcRenderer.invoke('editGrupoById', doc),
-  deletarGrupo: (id: number) => ipcRenderer.invoke('deletarGrupo', id),
-  listarMembros: () => ipcRenderer.invoke('listarMembors'),
+  //Equipes
+  addNovoEquipe: (doc: NewEquipeCustomer) => ipcRenderer.invoke('addNovoEquipe', doc),
+  listarEquipes: () => ipcRenderer.invoke('listarEquipes'),
+  listarEquipeById: (id: number) => ipcRenderer.invoke('listarEquipeById', id),
+  editEquipeById: (doc: EquipeCustomer) => ipcRenderer.invoke('editEquipeById', doc),
+  deletarEquipe: (id: number) => ipcRenderer.invoke('deletarEquipe', id),
+  listarAtletas: () => ipcRenderer.invoke('listarMembors'),
   ///Peixes
   addNovoPeixe: (doc: NewPeixeCustomer) => ipcRenderer.invoke('addNovoPeixe', doc),
   listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
   listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
   deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id),
-  listarPeixeByGrupoId: (id: number) => ipcRenderer.invoke('listarPeixeByGrupoId', id)
+  listarPeixeByEquipeId: (id: number) => ipcRenderer.invoke('listarPeixeByEquipeId', id)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

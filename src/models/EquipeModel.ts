@@ -1,8 +1,8 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { GroupCustomer, NewGroupCustomer } from '../shared/types/interfaces'
+import { EquipeCustomer, NewEquipeCustomer } from '../shared/types/interfaces'
 import z from 'zod'
 
-export class GrupoModel {
+export class EquipeModel {
   private db: InstanceType<typeof DatabaseConstructor>
 
   constructor(db: InstanceType<typeof DatabaseConstructor>) {
@@ -12,10 +12,11 @@ export class GrupoModel {
 
   private criarTabela() {
     this.db.exec(`
-      CREATE TABLE IF NOT EXISTS grupos(
+      CREATE TABLE IF NOT EXISTS equipes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        qtde_membros INTEGER NOT NULL,
+        setor INTERGER NOT NULL,
+        qtde_atletas INTEGER NOT NULL,
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
@@ -24,37 +25,37 @@ export class GrupoModel {
     `)
   }
 
-  listar(): GroupCustomer[] {
+  listar(): EquipeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_membros, criado_em
-      FROM grupos
+      SELECT id, nome, ativo, qtde_atletas, criado_em
+      FROM equipes
       WHERE deletado_em IS NULL
       ORDER BY criado_em DESC
     `)
 
-    return stmt.all() as GroupCustomer[]
+    return stmt.all() as EquipeCustomer[]
   }
 
-  getById(id: number): GroupCustomer | null {
+  getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_membros, criado_em
-      FROM grupos
+      SELECT id, nome, ativo, qtde_atletas, criado_em
+      FROM equipes
       WHERE deletado_em IS NULL
         AND id = ?
       LIMIT 1
     `)
 
-    return stmt.get(id) as GroupCustomer
+    return stmt.get(id) as EquipeCustomer
   }
 
-  edit(data: GroupCustomer): GroupCustomer | null {
+  edit(data: EquipeCustomer): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      UPDATE grupos
-      SET nome = ?, qtde_membros = ?      
+      UPDATE equipes
+      SET nome = ?, qtde_atletas = ?      
       WHERE id = ?      
     `)
 
-    const result = stmt.run(data.nome, data.qtde_membros, data.id)
+    const result = stmt.run(data.nome, data.qtde_atletas, data.id)
     if (result.changes === 0) {
       return null
     }
@@ -62,26 +63,26 @@ export class GrupoModel {
     return this.getById(data.id)
   }
 
-  add(data: NewGroupCustomer): NewGroupCustomer {
+  add(data: NewEquipeCustomer): NewEquipeCustomer {
     const stmt = this.db.prepare(`
-      INSERT INTO grupos (nome, ativo, criado_em, qtde_membros) 
+      INSERT INTO equipes (nome, ativo, criado_em, qtde_atletas) 
       VALUES (?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.nome, data.ativo ?? 1, data.criado_em, data.qtde_membros)
+    const res = stmt.run(data.nome, data.ativo ?? 1, data.criado_em, data.qtde_atletas)
 
     const select = this.db.prepare(`
-      SELECT id, nome, ativo, criado_em, qtde_membros
-      FROM grupos
+      SELECT id, nome, ativo, criado_em, qtde_atletas
+      FROM equipes
       WHERE id = ?
     `)
 
-    return select.get(res.lastInsertRowid) as NewGroupCustomer
+    return select.get(res.lastInsertRowid) as NewEquipeCustomer
   }
 
   delete(id: number): boolean {
     const stmt = this.db.prepare(`
-      DELETE from grupos 
+      DELETE from equipes 
       WHERE id = ?
     `)
 
