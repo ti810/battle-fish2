@@ -20,6 +20,7 @@ const api = {
   //Equipes
   addNovaEquipe: (doc: NewEquipeCustomer) => ipcRenderer.invoke('addNovaEquipe', doc),
   listarEquipes: () => ipcRenderer.invoke('listarEquipes'),
+  listarEquipesComUltimaCaptura: () => ipcRenderer.invoke('listarEquipesComUltimaCaptura'),
   listarEquipeById: (id: number) => ipcRenderer.invoke('listarEquipeById', id),
   editEquipeById: (doc: EquipeCustomer) => ipcRenderer.invoke('editEquipeById', doc),
   deletarEquipe: (id: number) => ipcRenderer.invoke('deletarEquipe', id),

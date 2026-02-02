@@ -1,5 +1,5 @@
 import DatabaseConstructor from 'better-sqlite3'
-import { EquipeCustomer, NewEquipeCustomer } from '../shared/types/interfaces'
+import { EquipeCustomer, NewEquipeCustomer, PeixeCustomer } from '../shared/types/interfaces'
 import z from 'zod'
 
 export class EquipeModel {
@@ -36,6 +36,25 @@ export class EquipeModel {
     return stmt.all() as EquipeCustomer[]
   }
 
+  listarComUltimaCapturaOfPeixe() {
+    const stmt = this.db.prepare(`
+    SELECT 
+      e.id,
+      e.nome,
+      e.ativo,
+      e.qtde_atletas,
+      e.criado_em,
+      MAX(p.criado_em) AS ultima_captura
+    FROM equipes e
+    LEFT JOIN peixes p 
+      ON p.id_equipe = e.id 
+     AND p.deletado_em IS NULL
+    GROUP BY e.id
+  `)
+
+    return stmt.all()
+  }
+
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       SELECT id, nome, ativo, qtde_atletas, criado_em
@@ -63,8 +82,7 @@ export class EquipeModel {
     return this.getById(data.id)
   }
 
-  add(data: NewEquipeCustomer): NewEquipeCustomer {   
- 
+  add(data: NewEquipeCustomer): NewEquipeCustomer {
     const stmt = this.db.prepare(`
       INSERT INTO equipes (nome, ativo, setor, criado_em, qtde_atletas) 
       VALUES (?, ?, ?, ?, ?)

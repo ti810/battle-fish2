@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Plus, Search, Fish, MoreVertical, Scale, Ruler, Users, Edit2, Trash2 } from 'lucide-react';
 import { findDimensionValueType, motion } from 'framer-motion';
 import { agoraParaSQLite } from '../lib/utils';
-import { NewEquipeCustomer, EquipeCustomer, PeixeCustomer, NewPeixeCustomer } from '~/src/shared/types/interfaces';
+import { NewEquipeCustomer, PeixeCustomer, NewPeixeCustomer, EquipeCustomer, EquipeCustomerComUltimaCaptura } from '~/src/shared/types/interfaces';
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
 import { equipeSchema, peixeSchema } from '../hooks/formValidation';
 import { Rifm } from 'rifm';
 import { preview } from 'vite';
+import tempoRelativo from '../utils/tempoRelativo';
 
 
 export default function Equipes() {
@@ -30,7 +31,9 @@ export default function Equipes() {
   const [showAddEquipeModal, setShowAddEquipeModal] = useState(false);
   const [showEditEquipeModal, setShowEditEquipeModal] = useState(false);
   const [showDeleteEquipeModal, setShowDeleteEquipeModal] = useState(false);
-  const [equipes, setEquipes] = useState<EquipeCustomer[]>([]);
+  const [equipes, setEquipes] = useState<EquipeCustomerComUltimaCaptura[]>([]);
+  const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomerComUltimaCaptura | null>(null)
+  const [isEquipeSelecionada, setIsEquipeSelecionada] = useState(false);
   const [contagemPeixes, setContagemPeixes] = useState<Record<number, number>>({});
 
   const [equipeId, setEquipeId] = useState<number | null>(null)
@@ -103,7 +106,7 @@ export default function Equipes() {
         // Limpar valores dos Inputs 
         setEquipeForm(initialEquipeForm)
         setShowEditEquipeModal(false)
-        fetchListEquipe()
+        carregarDados()
 
       }
 
@@ -151,7 +154,7 @@ export default function Equipes() {
         // Limpar valores dos Inputs 
         setEquipeForm(initialEquipeForm)
         setShowAddEquipeModal(false)
-        fetchListEquipe()
+        carregarDados()
 
       }
 
@@ -173,7 +176,7 @@ export default function Equipes() {
       if (res.success) {
         toast.success(`Equipe excluído com sucesso`)
         setShowDeleteEquipeModal(false)
-        fetchListEquipe()
+        carregarDados()
 
       }
 
@@ -184,25 +187,6 @@ export default function Equipes() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fetchListEquipe = async () => {
-    try {
-      setLoading(true)
-
-      const res = await window.api.listarEquipes()
-
-      if (res.success) {
-        setEquipes(res.data)
-      }
-
-    } catch (error) {
-      console.log("Erro ao listar Equipes", error)
-      toast.error(`Erro ao listar Equipes ${error}`)
-    } finally {
-      setLoading(false)
-    }
-
   }
 
   const getEquipeId = async (id: number) => {
@@ -259,6 +243,7 @@ export default function Equipes() {
           criado_em: ""
         })
         setShowAddPeixeModal(false)
+        carregarDados()
 
       }
 
@@ -273,7 +258,10 @@ export default function Equipes() {
   };
 
   const carregarDados = async () => {
-    const res = await window.api.listarEquipes();
+    const res = await window.api.listarEquipesComUltimaCaptura();
+
+    // console.log(res.data)
+    // return
 
     if (res.success) {
       setEquipes(res.data);
@@ -295,10 +283,7 @@ export default function Equipes() {
   };
 
 
-
-
   useEffect(() => {
-    // fetchListEquipe()
     carregarDados()
   }, [])
 
@@ -337,7 +322,14 @@ export default function Equipes() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => setShowAddPeixeModal(true)}
+              onClick={() => {
+                setShowAddPeixeModal(true)
+                setIsEquipeSelecionada(false)
+                setPeixeForm(prev => ({
+                  ...prev,
+                  id_equipe: 0
+                }));
+              }}
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-green-200"
             >
               <Fish className="w-4 h-4" />
@@ -373,7 +365,7 @@ export default function Equipes() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               key={equipe.id}
-              className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow Equipe"
+              className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
             >
               <div className="flex gap-3 justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
@@ -456,16 +448,25 @@ export default function Equipes() {
                 </div>
                 <div className="bg-gray-50 p-2 rounded-lg text-center">
                   <p className="text-xs text-gray-500">Capturas</p>
-                  <p className="font-semibold text-blue-600">{contagemPeixes[equipe.id] ?? "Adcionar peixe"}</p>
+                  <p className="font-semibold text-blue-600">{contagemPeixes[equipe.id] ?? 0}</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-50">
-                {/* <span>Última captura: {equipe.lastCatch}</span> VER DEPOIS */}
+                <span>Última captura: {tempoRelativo(equipe.ultima_captura)}</span>
 
                 <button
-                  onClick={() => null}
-                  className="text-blue-600 hover:text-blue-700 font-medium opacity-0 Equipe-hover:opacity-100 transition-opacity flex items-center gap-1"
+                  onClick={() => {
+                    setEquipeSelecionada(equipe)
+                    setIsEquipeSelecionada(true)
+                    setPeixeForm(prev => ({
+                      ...prev,
+                      id_equipe: equipe.id
+                    }));
+                    setShowAddPeixeModal(true)
+
+                  }}
+                  className="text-blue-600 hover:text-blue-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   Adicionar Peixe
@@ -477,7 +478,7 @@ export default function Equipes() {
 
         {/* Add Catch Modal */}
         {showAddPeixeModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="equipe fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -492,16 +493,22 @@ export default function Equipes() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Equipe</label>
 
                   <select
-                    value={Number(equipeId)}
+                    value={peixeForm.id_equipe ?? ""}
                     onChange={(e) => {
-                      const valor = Number(e.target.value)
-                      setEquipeForm({ ...equipeForm, id: valor })
-                      setEquipeId(valor)
+                      setPeixeForm(prev => ({
+                        ...prev,
+                        id_equipe: Number(e.target.value)
+                      }))
+                      setEquipeId(peixeForm.id_equipe)
                     }}
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                   >
                     <option disabled value={0}>Selecione um equipe...</option>
-                    {equipes.map((equipe) => (
+                    {equipeSelecionada && isEquipeSelecionada ? (
+                      <option value={equipeSelecionada.id}>
+                        {equipeSelecionada.nome}
+                      </option>
+                    ) : equipes.map((equipe) => (
                       <option key={equipe.id} value={equipe.id}>{equipe.nome}</option>
                     ))}
                   </select>
@@ -576,18 +583,18 @@ export default function Equipes() {
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
-                    onClick={() => setShowAddPeixeModal(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
                     onClick={() => {
                       handleAddPeixe()
                     }}
                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md"
                   >
                     Salvar Captura
+                  </button>
+                  <button
+                    onClick={() => setShowAddPeixeModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancelar
                   </button>
                 </div>
               </div>

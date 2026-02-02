@@ -49,7 +49,6 @@ export class PeixeModel {
   }
 
   listarByEquipeId(equipeId: number): PeixeCustomer[] {
-    
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso
       FROM peixes p    
@@ -60,7 +59,7 @@ export class PeixeModel {
 
     return stmt.all(equipeId) as PeixeCustomer[]
   }
-
+  
 
   buscarById(id: number): PeixeCustomer | null {
     const stmt = this.db.prepare(`

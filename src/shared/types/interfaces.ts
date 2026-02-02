@@ -40,6 +40,15 @@ export interface EquipeCustomer extends NewEquipeCustomer {
   id: number
 }
 
+export interface EquipeCustomerComUltimaCaptura extends NewEquipeCustomer {
+  id: number
+  nome: string
+  ativo?: number
+  qtde_atletas: number
+  setor: number
+  ultima_captura: string | null
+}
+
 export interface NewPeixeCustomer {
   tipo: string
   tamanho: string
