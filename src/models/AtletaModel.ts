@@ -28,7 +28,7 @@ export class AtletaModel {
   add(data: NewAtletaCustomer): number {
     const stmt = this.db.prepare(`
         INSERT INTO atletas nome, equipe_id) 
-        VALUES (?, ?, ?, ?)`)
+        VALUES (?, ?)`)
     const res = stmt.run(data.nome, data.equipe_id)
     return Number(res.lastInsertRowid)
   }
