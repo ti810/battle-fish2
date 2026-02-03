@@ -39,3 +39,10 @@ export const peixeSchema = z.object({
   tamanho: z.string().min(0.1, 'Tamanho de peixe tem que ser maior que 1 centimetro'),
   peso: z.string().min(0.01, 'Peso do peixe precisa ser maior que 10 gramas')
 })
+
+export const atletaSchema = z.object({
+  nome: z.string()
+  .trim()
+  .min(4, 'Nome do atleta muito curto: Mínimo 4 caracteres')
+  .max(50, 'Nome do atleta muito grande: Máximo 50 caracteres')
+})

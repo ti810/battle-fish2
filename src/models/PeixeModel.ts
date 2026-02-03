@@ -75,6 +75,48 @@ export class PeixeModel {
     return result ? (result as PeixeCustomer) : null
   }
 
+  update(peixe: PeixeCustomer): boolean {
+      const fields: string[] = []
+      const values: unknown[] = []
+  
+      if (peixe.tipo !== undefined) {
+        fields.push('tipo = ?')
+        values.push(peixe.tipo)
+      }
+  
+      if (peixe.tamanho !== undefined) {
+        fields.push('tamanho = ?')
+        values.push(peixe.tamanho)
+      }
+
+      if (peixe.peso !== undefined) {
+        fields.push('peso = ?')
+        values.push(peixe.peso)
+      }
+
+      if (peixe.id_equipe !== undefined) {
+        fields.push('id_equipe = ?')
+        values.push(peixe.id_equipe)
+      }
+  
+      if (fields.length === 0) {
+        // nada para atualizar
+        return false
+      }
+  
+      values.push(peixe.id)
+  
+      const stmt = this.db.prepare(`
+        UPDATE peixes
+        SET ${fields.join(', ')}
+        WHERE id = ?
+      `)
+  
+      const res = stmt.run(...values)
+      return res.changes > 0
+    }
+  
+
   delete(id: number): boolean {
     const stmt = this.db.prepare(`
       DELETE FROM peixes
