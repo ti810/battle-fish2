@@ -7,9 +7,7 @@ interface Atleta {
   name: string
   role: string
   group: string
-  email: string
-  status: string
-  phone?: string
+  setor: string
 }
 
 export default function Atletas() {
@@ -19,45 +17,35 @@ export default function Atletas() {
       name: 'João Silva',
       role: 'Capitão',
       group: 'Pescadores do Sul',
-      email: 'joao@email.com',
-      status: 'Ativo',
-      phone: '(11) 98765-4321'
+      setor: "1",
     },
     {
       id: 2,
       name: 'Pedro Santos',
       role: 'Atleta',
       group: 'Pescadores do Sul',
-      email: 'pedro@email.com',
-      status: 'Ativo',
-      phone: '(11) 98765-1234'
+      setor: "2",
     },
     {
       id: 3,
       name: 'Carlos Oliveira',
       role: 'Capitão',
       group: 'Anzol de Ouro',
-      email: 'carlos@email.com',
-      status: 'Pendente',
-      phone: '(11) 97654-3210'
+      setor: "3",
     },
     {
       id: 4,
       name: 'Ana Souza',
       role: 'Atleta',
       group: 'Anzol de Ouro',
-      email: 'ana@email.com',
-      status: 'Ativo',
-      phone: '(11) 96543-2109'
+      setor: "4",
     },
     {
       id: 5,
       name: 'Marcos Lima',
       role: 'Capitão',
       group: 'Maré Alta',
-      email: 'marcos@email.com',
-      status: 'Ativo',
-      phone: '(11) 95432-1098'
+      setor: "5",
     }
   ])
 
@@ -67,11 +55,9 @@ export default function Atletas() {
 
   const [memberForm, setMemberForm] = useState({
     name: '',
-    email: '',
-    phone: '',
     group: 'Pescadores do Sul',
     role: 'Atleta',
-    status: 'Ativo'
+    setor: '1'
   })
 
   const availableGroups = ['Pescadores do Sul', 'Anzol de Ouro', 'Maré Alta', 'Tubarões']
@@ -81,21 +67,17 @@ export default function Atletas() {
       setEditingMember(member)
       setMemberForm({
         name: member.name,
-        email: member.email,
-        phone: member.phone || '',
         group: member.group,
         role: member.role,
-        status: member.status
+        setor: member.setor
       })
     } else {
       setEditingMember(null)
       setMemberForm({
         name: '',
-        email: '',
-        phone: '',
         group: 'Pescadores do Sul',
         role: 'Atleta',
-        status: 'Ativo'
+        setor: 'Ativo'
       })
     }
     setShowModal(true)
@@ -107,7 +89,7 @@ export default function Atletas() {
   }
 
   const handleSaveMember = () => {
-    if (!memberForm.name || !memberForm.email) return
+    if (!memberForm.name) return
 
     if (editingMember) {
       setMembers(members.map((m) => (m.id === editingMember.id ? { ...m, ...memberForm } : m)))
@@ -130,7 +112,6 @@ export default function Atletas() {
   const filteredMembers = members.filter(
     (m) =>
       m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.group.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -173,7 +154,7 @@ export default function Atletas() {
                 <th className="px-6 py-3">Atleta</th>
                 <th className="px-6 py-3">Equipe</th>
                 <th className="px-6 py-3">Função</th>
-                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Setor</th>
                 <th className="px-6 py-3 text-right">Ações</th>
               </tr>
             </thead>
@@ -193,7 +174,6 @@ export default function Atletas() {
                       </div>
                       <div>
                         <div className="font-medium text-gray-900">{member.name}</div>
-                        <div className="text-xs text-gray-500">{member.email}</div>
                       </div>
                     </div>
                   </td>
@@ -209,18 +189,13 @@ export default function Atletas() {
                       {member.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="p-2 text-center">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border ${
-                        member.status === 'Ativo'
-                          ? 'bg-green-50 text-green-700 border-green-100'
-                          : 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                      className={`inline-flex items-center p-1 rounded-full text-xs font-medium border  w-auto h-auto ${
+                        member.setor === '1'
                       }`}
                     >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${member.status === 'Ativo' ? 'bg-green-500' : 'bg-yellow-500'}`}
-                      />
-                      {member.status}
+                      {member.setor}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -290,26 +265,15 @@ export default function Atletas() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={memberForm.email}
-                    onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                    placeholder="joao@email.com"
-                  />
-                </div>
-
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Telefone (opcional)
+                    Setor
                   </label>
                   <input
-                    type="tel"
-                    value={memberForm.phone}
-                    onChange={(e) => setMemberForm({ ...memberForm, phone: e.target.value })}
+                    type="text"
+                    value={memberForm.setor}
+                    onChange={(e) => setMemberForm({ ...memberForm, setor: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                    placeholder="(11) 98765-4321"
+                    placeholder="Digite o numero do setor"
                   />
                 </div>
 
@@ -338,19 +302,6 @@ export default function Atletas() {
                     >
                       <option value="Atleta">Atleta</option>
                       <option value="Capitão">Capitão</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={memberForm.status}
-                      onChange={(e) => setMemberForm({ ...memberForm, status: e.target.value })}
-                      className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                    >
-                      <option value="Ativo">Ativo</option>
-                      <option value="Pendente">Pendente</option>
-                      <option value="Inativo">Inativo</option>
                     </select>
                   </div>
                 </div>
