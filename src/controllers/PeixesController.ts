@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { PeixeModel } from '../models/PeixeModel'
 import DatabaseConstructor from 'better-sqlite3'
-import { NewPeixeCustomer } from '../shared/types/interfaces'
+import { NewPeixeCustomer, PeixeCustomer } from '../shared/types/interfaces'
 import { peixeSchema } from '../renderer/src/hooks/formValidation'
 
 export class PeixesController {
@@ -57,6 +57,18 @@ export class PeixesController {
         throw error
       }
     })
+
+    ipcMain.handle('editPeixeById', async (_, doc: PeixeCustomer) => {
+              try {
+                return {
+                  success: true,
+                  data: this.model.update(doc)
+                }
+              } catch (error) {
+                console.error('Erro ao atualizar peixe:', error)
+                throw error
+              }
+            })
 
     ipcMain.handle('deletarPeixe', (event, id) => {
       try {
