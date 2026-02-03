@@ -189,9 +189,9 @@ export default function Atletas() {
                       {member.role}
                     </span>
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="px-6 py-4">
                     <span
-                      className={`inline-flex items-center p-1 rounded-full text-xs font-medium border  w-auto h-auto ${
+                      className={`w-8 h-8 rounded-full bg-linear-to-br from-green-400 to-green-600 opacity-70 flex items-center justify-center text-white font-bold text-xs shadow-md ${
                         member.setor === '1'
                       }`}
                     >
