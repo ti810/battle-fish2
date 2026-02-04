@@ -64,13 +64,14 @@ const MOCK_TEAMS: Team[] = [
 ]
 
 export default function Ranking() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'geral' | 'peso' | 'quantidade' | 'tamanho'>('geral')
   const [teams, setTeams] = useState(MOCK_TEAMS)
   const [isRevealed, setIsRevealed] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [data, setData] = useState<string | null>(null);
 
   const CORRECT_PASSWORD = '1234' // Change this to your desired password
 
@@ -140,6 +141,15 @@ export default function Ranking() {
 
   const sortedTeams = getSortedTeams()
   const top3 = sortedTeams.slice(0, 3)
+
+//Loader
+  useEffect(() => {
+    // Simulando carregamento de dados
+    setTimeout(() => {
+      setData("Conteúdo carregado!");
+      setLoading(false);
+    }, 3000);
+  }, []);
 
   return (
     <>
