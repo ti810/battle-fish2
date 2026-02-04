@@ -51,6 +51,19 @@ export class AtletasController {
             throw error
           }
         })
+
+        ipcMain.handle('atletaComSetor', async (_event, id: number) => {
+          try {
+            // console.log(this.model.listar())
+            return {
+              success: true,
+              data: this.model.getSetor()
+            }
+          } catch (error) {
+            console.error('Erro ao buscar Setor:', error)
+            throw error
+          }
+        })
     
         ipcMain.handle('editAtletaById', async (_, doc: AtletaCustomer) => {
           try {

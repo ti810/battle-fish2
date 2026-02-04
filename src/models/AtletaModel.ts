@@ -14,7 +14,7 @@ export class AtletaModel {
       CREATE TABLE IF NOT EXISTS atletas(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        equipe_id INTEGER NOT NULL,  
+        equipe_id INTEGER NOT NULL, 
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
         deletado_em TEXT,
@@ -27,7 +27,7 @@ export class AtletaModel {
   }
   add(data: NewAtletaCustomer): number {
     const stmt = this.db.prepare(`
-        INSERT INTO atletas nome, equipe_id) 
+        INSERT INTO atletas (nome, equipe_id) 
         VALUES (?, ?)`)
     const res = stmt.run(data.nome, data.equipe_id)
     return Number(res.lastInsertRowid)
@@ -52,6 +52,20 @@ export class AtletaModel {
        `)
 
     return (stmt.get(id) ?? null) as AtletaCustomer | null
+  }
+
+  getSetor(): AtletaCustomer[] {
+    const stmt = this.db.prepare(`
+      SELECT a.id,
+      a.nome,
+      a.equipe_id,
+      e.setor as equipe_setor,
+      e.nome as equipe_nome
+      FROM atletas a
+      JOIN equipes e ON e.id = a.equipe_id
+      ORDER BY a.nome`)
+
+      return stmt.all() as AtletaCustomer[] 
   }
 
   update(atleta: AtletaCustomer): boolean {

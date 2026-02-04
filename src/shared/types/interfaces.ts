@@ -17,13 +17,15 @@ export interface UserCustomer {
 export interface NewAtletaCustomer {
   nome: string
   equipe_id: number
-  criado_em: string
+  criado_em?: string
 }
 
 export interface AtletaCustomer {
   id: number
-  nome?: string
-  equipe_id?: number
+  nome: string
+  equipe_id: number
+  equipe_setor: string
+  equipe_nome: string
 }
 
 export interface NewEquipeCustomer {
@@ -31,7 +33,7 @@ export interface NewEquipeCustomer {
   ativo?: number
   qtde_atletas: number
   setor: number
-  criado_em: string
+  criado_em?: string
   atualizado_em?: string
   deletado_em?: string
 }
