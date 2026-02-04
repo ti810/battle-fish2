@@ -24,8 +24,8 @@ export interface AtletaCustomer {
   id: number
   nome: string
   equipe_id: number
-  equipe_setor: string
-  equipe_nome: string
+  equipe_setor?: string
+  equipe_nome?: string
 }
 
 export interface NewEquipeCustomer {
@@ -61,4 +61,11 @@ export interface NewPeixeCustomer {
 
 export interface PeixeCustomer extends NewPeixeCustomer {
   id: number
+}
+
+export interface RankingCustomer{
+  equipe_nome: string
+  peso_total: number
+  quantidade: number
+  pontos: number
 }
