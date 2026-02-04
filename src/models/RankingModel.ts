@@ -8,7 +8,7 @@ export class RankingModel{
         this.db = db
       }
     
-    Ranking(): RankingCustomer[]{
+    ranking(): RankingCustomer[]{
         const stmt = this.db.prepare(`
         SELECT
          e.nome AS equipe_nome,
