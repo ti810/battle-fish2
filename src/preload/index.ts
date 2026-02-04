@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewEquipeCustomer, NewUserCustomer, NewPeixeCustomer, EquipeCustomer, NewAtletaCustomer, AtletaCustomer } from '../shared/types/interfaces'
+import { NewEquipeCustomer, NewUserCustomer, NewPeixeCustomer, EquipeCustomer, NewAtletaCustomer, AtletaCustomer, PeixeCustomer } from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -28,6 +28,7 @@ const api = {
   addNovoAtleta: (doc: NewAtletaCustomer) => ipcRenderer.invoke('addNovoAtleta', doc),
   listarAtletas: () => ipcRenderer.invoke('listarAtletas'),
   listarAtletaById: (id: number) => ipcRenderer.invoke('listarAtletaById', id),
+  atletaComSetor: () => ipcRenderer.invoke('atletaComSetor'),
   editAtletaById: (doc: AtletaCustomer) => ipcRenderer.invoke('editAtletaById', doc),
   deletarAtleta: (id: number) => ipcRenderer.invoke('deletarAtleta', id),
   ///Peixes
@@ -35,7 +36,8 @@ const api = {
   listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
   listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
   deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id),
-  listarPeixeByEquipeId: (id: number) => ipcRenderer.invoke('listarPeixeByEquipeId', id)
+  listarPeixeByEquipeId: (id: number) => ipcRenderer.invoke('listarPeixeByEquipeId', id),
+  editPeixeById: (doc: PeixeCustomer) => ipcRenderer.invoke('editPeixeById', doc),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
