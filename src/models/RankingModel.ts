@@ -11,9 +11,12 @@ export class RankingModel{
     ranking(): RankingCustomer[]{
         const stmt = this.db.prepare(`
         SELECT
+         e.id AS id,
          e.nome AS equipe_nome,
          COUNT(p.id) AS quantidade,
-         IFNULL(SUM(p.peso), 0) AS peso_total
+         IFNULL(SUM(p.peso), 0) AS peso_total,
+         IFNULL(MAX(p.tamanho), 0) AS tamanho,
+         (COUNT(p.id) + (IFNULL(sum(p.peso), 0) * 2.0 / 100.0)) AS pontos
         FROM equipes e
         LEFT JOIN peixes p
         ON p.id_equipe = e.id

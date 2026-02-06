@@ -9,6 +9,7 @@ import { UsuariosController } from '../controllers/UsuariosController'
 import { EquipesController } from '../controllers/EquipesController'
 import { AtletasController } from '../controllers/AtletasController'
 import { PeixesController } from '../controllers/PeixesController'
+import { RankingController } from '../controllers/RankingController'
 const db = new Database('./src/database/app.db')
 
 let mainWindow: BrowserWindow | null = null
@@ -73,6 +74,7 @@ app.whenReady().then(() => {
   new EquipesController(db)
   new AtletasController(db)
   new PeixesController(db);
+  new RankingController(db)
 
   electronApp.setAppUserModelId('com.electron')
 

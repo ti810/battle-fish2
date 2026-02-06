@@ -67,5 +67,5 @@ export interface RankingCustomer{
   equipe_nome: string
   peso_total: number
   quantidade: number
-  pontos: number
+  tamanho: number
 }
