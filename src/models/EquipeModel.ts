@@ -42,6 +42,7 @@ export class EquipeModel {
       e.id,
       e.nome,
       e.ativo,
+      e.setor,
       e.qtde_atletas,
       e.criado_em,
       MAX(p.criado_em) AS ultima_captura
@@ -57,7 +58,7 @@ export class EquipeModel {
 
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_atletas, criado_em
+      SELECT id, nome, ativo, setor, qtde_atletas, criado_em
       FROM equipes
       WHERE deletado_em IS NULL
         AND id = ?
@@ -70,11 +71,11 @@ export class EquipeModel {
   edit(data: EquipeCustomer): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       UPDATE equipes
-      SET nome = ?, qtde_atletas = ?      
+      SET nome = ?, qtde_atletas = ?, setor = ?      
       WHERE id = ?      
     `)
 
-    const result = stmt.run(data.nome, data.qtde_atletas, data.id)
+    const result = stmt.run(data.nome, data.qtde_atletas, data.setor, data.id)
     if (result.changes === 0) {
       return null
     }

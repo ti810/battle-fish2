@@ -27,7 +27,8 @@ export const equipeSchema = z.object({
     .trim()
     .min(4, 'Nome da Equipe está muito curtao(Minimo 4 caracteres)')
     .max(50, 'Nome da Equipe é muito longo'),
-  qtde_atletas: z.number().min(2, 'Quantidade de Atletas por Equipe tem que ser no minimo 2')
+  qtde_atletas: z.number().min(2, 'Quantidade de Atletas por Equipe tem que ser no minimo 2'),
+  setor: z.number().min(1, 'Setor nao pode ser menor que 1')
 })
 
 export const peixeSchema = z.object({
