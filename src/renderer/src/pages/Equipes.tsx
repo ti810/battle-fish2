@@ -45,8 +45,8 @@ export default function Equipes() {
   // Form states
   const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
     nome: "",
-    qtde_atletas: 1,
-    setor: 1,
+    qtde_atletas: 0,
+    setor: 0,
     criado_em: agoraParaSQLite(),
   });
 
@@ -64,10 +64,10 @@ export default function Equipes() {
   })
 
   const initialEquipeForm = {
-    id: Number(null as number | null),
+    id: Number("" as number | ""),
     nome: "",
-    setor: Number(null as number | null),
-    qtde_atletas: 1,
+    setor: Number("" as number | ""),
+    qtde_atletas: Number('' as number | ""),
     criado_em: "",
   }
 
@@ -91,6 +91,11 @@ export default function Equipes() {
         if (firstField === "qtde_atletas") {
           qtdeRef.current?.focus()
         }
+
+        if (firstField === "setor") {
+          setorRef.current?.focus()
+        }
+
 
         toast.error(
           <div className="space-y-1">
@@ -142,6 +147,10 @@ export default function Equipes() {
 
         if (firstField === "qtde_atletas") {
           qtdeRef.current?.focus()
+        }
+
+        if (firstField === "setor") {
+          setorRef.current?.focus()
         }
 
         toast.error(
@@ -819,6 +828,24 @@ const handleAddAtleta = async () => {
                       })
                     }}
                     className={`${fieldErrors.qtde_atletas ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    placeholder="1"
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Setor <span className='text-red-600'>*</span></label>
+                  <input
+                    type="number"
+                    ref={setorRef}
+                    value={equipeForm.setor}
+                    onChange={(e) => {
+                      setEquipeForm({ ...equipeForm, setor: Number(e.target.value) })
+                      setFieldErrors((prev) => {
+                        const { setor, ...rest } = prev
+                        return rest
+                      })
+                    }}
+                    className={`${fieldErrors.setor ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="1"
                     min="1"
                   />
