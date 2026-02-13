@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Plus, Search, Fish, MoreVertical, Scale, Ruler, Users, Edit2, Trash2 } from 'lucide-react';
 import { findDimensionValueType, motion } from 'framer-motion';
 import { agoraParaSQLite } from '../lib/utils';
-import { NewEquipeCustomer, PeixeCustomer, NewPeixeCustomer, EquipeCustomer, EquipeCustomerComUltimaCaptura } from '~/src/shared/types/interfaces';
+import { NewEquipeCustomer, PeixeCustomer, NewPeixeCustomer, EquipeCustomer, EquipeCustomerComUltimaCaptura, NewAtletaCustomer } from '~/src/shared/types/interfaces';
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
-import { equipeSchema, peixeSchema } from '../hooks/formValidation';
+import { equipeSchema, peixeSchema, atletaSchema} from '../hooks/formValidation';
 import { Rifm } from 'rifm';
 import { preview } from 'vite';
 import tempoRelativo from '../utils/tempoRelativo';
@@ -24,14 +24,17 @@ export default function Equipes() {
 
   const nomeRef = useRef<HTMLInputElement>(null)
   const setorRef = useRef<HTMLInputElement>(null)
+  const nomeAtref = useRef<HTMLInputElement>(null)
   const qtdeRef = useRef<HTMLInputElement>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   const [showAddPeixeModal, setShowAddPeixeModal] = useState(false);
   const [showAddEquipeModal, setShowAddEquipeModal] = useState(false);
+  const [showAtletaModal, setShowAtletaModal] = useState(false);
   const [showEditEquipeModal, setShowEditEquipeModal] = useState(false);
   const [showDeleteEquipeModal, setShowDeleteEquipeModal] = useState(false);
   const [equipes, setEquipes] = useState<EquipeCustomerComUltimaCaptura[]>([]);
+  const [atleta, setAtletas] = useState<NewAtletaCustomer[]>([])
   const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomerComUltimaCaptura | null>(null)
   const [isEquipeSelecionada, setIsEquipeSelecionada] = useState(false);
   const [contagemPeixes, setContagemPeixes] = useState<Record<number, number>>({});
@@ -55,6 +58,11 @@ export default function Equipes() {
     criado_em: agoraParaSQLite()
   });
 
+  const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
+    nome: "",
+    equipe_id: Number(null as number | null),
+  })
+
   const initialEquipeForm = {
     id: Number("" as number | ""),
     nome: "",
@@ -62,6 +70,8 @@ export default function Equipes() {
     qtde_atletas: Number('' as number | ""),
     criado_em: "",
   }
+
+
 
 
   // CRUD Equipe 
@@ -290,7 +300,55 @@ export default function Equipes() {
       setContagemPeixes(contagens);
     }
   };
+// CRUD atleta
+const handleAddAtleta = async () => {
+    try {
 
+      const validationRules = formValidation(atletaSchema, atletaForm)
+
+      if (!validationRules.success) {
+        setFieldErrors(validationRules.fieldErrors)
+        const firstField = Object.keys(validationRules.fieldErrors)[0]
+        if (firstField === "nome") {
+          nomeAtref.current?.focus()
+        }
+
+        toast.error(
+          <div className="space-y-1">
+            {Object.values(validationRules.fieldErrors).map((err, index) => (
+              <p key={index}>• {err}</p>
+            ))}
+          </div>
+        )
+
+        return
+      }
+
+
+      const res = await window.api.addNovoAtleta(atletaForm as NewAtletaCustomer)
+
+
+      if (res.success) {
+        toast.success("Atleta salvo com sucesso")
+        // Limpar valores dos Inputs 
+        setAtletaForm({
+          nome: "",
+          equipe_id: Number(null as number | null),
+        })
+        setShowAtletaModal(false)
+        carregarDados()
+
+      }
+
+
+    } catch (error) {
+      console.log("Erro ao salvar dados do Equipe", error)
+      toast.error(`Erro ao salvar dados do Equipe ${error}`)
+    } finally {
+      setLoading(false)
+    }
+
+  };
 
   useEffect(() => {
     carregarDados()
@@ -316,6 +374,15 @@ export default function Equipes() {
       setPeixeForm(prev => ({
         ...prev,
         id_equipe: equipeId
+      }))
+    }
+  }, [equipeId]);
+
+   useEffect(() => {
+    if (equipeId) {
+      setAtletaForm(prev => ({
+        ...prev,
+        equipe_id: equipeId
       }))
     }
   }, [equipeId]);
@@ -475,10 +542,27 @@ export default function Equipes() {
                     setShowAddPeixeModal(true)
 
                   }}
-                  className="text-blue-600 hover:text-blue-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                  className="text-blue-600 flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   Adicionar Peixe
+                </button>
+                {/* Atleta*/}
+                <button
+                  onClick={() => {
+                    setEquipeSelecionada(equipe)
+                    setIsEquipeSelecionada(true)
+                    setAtletaForm(prev => ({
+                      ...prev,
+                      equipe_id: equipe.id
+                    }));
+                    setShowAtletaModal(true)
+
+                  }}
+                  className="text-blue-600  flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Adicionar Atleta
                 </button>
               </div>
             </motion.div>
@@ -662,7 +746,7 @@ export default function Equipes() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Setor? <span className='text-red-600'>*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Setor <span className='text-red-600'>*</span></label>
                   <input
                     type="number"
                     ref={setorRef}
@@ -821,6 +905,109 @@ export default function Equipes() {
         )
         }
       </div >
+      {/*AtletaModal*/}
+       {showAtletaModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.9, opacity: 0 }}
+      className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          Novo atleta
+        </h2>
+
+        <button
+          onClick={() => setShowAtletaModal(false)}
+          className="text-gray-400 hover:text-gray-600"
+          type="button"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {/* Nome */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Nome completo
+          </label>
+
+          <input
+            type="text"
+            ref={nomeAtref}
+            value={atletaForm.nome}
+            onChange={(e) => {
+              setAtletaForm({
+                ...atletaForm,
+                nome: e.target.value
+              })
+            }}
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+          />
+        </div>
+
+        {/* Equipe */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Equipe
+          </label>
+
+          <select
+            value={atletaForm.equipe_id ?? ""}
+            onChange={(e) => {
+              setAtletaForm(prev => ({
+                ...prev,
+                equipe_id: Number(e.target.value)
+              }))
+
+              setEquipeId(atletaForm.equipe_id)
+            }}
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+          >
+             <option disabled value="">
+                Selecione uma equipe...
+             </option>
+
+            {equipeSelecionada && isEquipeSelecionada ? (
+              <option value={equipeSelecionada.id}>
+                {equipeSelecionada.nome}
+              </option>
+            ) : (
+              equipes.map((equipe) => (
+                <option key={equipe.id} value={equipe.id}>
+                  {equipe.nome}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => setShowAtletaModal(false)}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            onClick={handleAddAtleta}
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+          >
+            Adicionar
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  </div>
+)}
+
+      
     </>
 
   );
