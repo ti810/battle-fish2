@@ -44,5 +44,6 @@ export const atletaSchema = z.object({
   nome: z.string()
   .trim()
   .min(4, 'Nome do atleta muito curto: Mínimo 4 caracteres')
-  .max(50, 'Nome do atleta muito grande: Máximo 50 caracteres')
+  .max(50, 'Nome do atleta muito grande: Máximo 50 caracteres'),
+  equipe_id: z.number().min(1)
 })

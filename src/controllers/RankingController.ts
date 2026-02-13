@@ -13,12 +13,12 @@ export class RankingController {
   }
 
     private registrarRotas() {
-  ipcMain.handle('listarRanking', async () => {
-    try {
-      return this.model.ranking()
-    } catch (error) {
-      console.error('Erro ao listar Ranking:', error)
-      throw error
-    }
-  })
-}}
+      ipcMain.handle('listarRanking', async () => {
+        try {
+          return this.model.ranking()
+        } catch (error) {
+          console.error('Erro ao listar Ranking:', error)
+          throw error
+        }
+      })
+    }}
