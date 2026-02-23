@@ -1,17 +1,18 @@
 import React from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Trophy, Users, UserCircle, Fish, Menu, X, Anchor } from 'lucide-react'
+import { Trophy, Users, UserCircle, Fish, Menu, X, Anchor, ClipboardList } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 
-import logo from '../assets/images/logo.png'
+import logo from '../assets/images/novo_icone_battle_fish.png'
 
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
     { to: '/', icon: Trophy, label: 'Ranking' },
     { to: '/equipes', icon: Fish, label: 'Equipes' },
     { to: '/atletas', icon: Users, label: 'Atletas' },
-    { to: '/usuarios', icon: UserCircle, label: 'Usuários' }
+    { to: '/usuarios', icon: UserCircle, label: 'Usuários' },
+    {to: '/custodia', icon: ClipboardList, label:'Custódia'}
   ]
 
   return (
@@ -40,8 +41,12 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
         <div className="h-16 flex items-center justify-center border-b border-gray-100 bg-blue-600">
           <div className="flex items-center gap-2 text-white font-bold text-xl">
             <img className="w-[50px] h-[50px] object-contain rounded-2xl" src={logo} />
-            {/* <Anchor className="w-6 h-6" /> */}
-            <span>BattleFish</span>
+          </div>
+
+          <div className="justify-center">
+            <span className="text-white font-bold uppercase text-3xl">
+              BattleFish
+            </span>
           </div>
         </div>
 
