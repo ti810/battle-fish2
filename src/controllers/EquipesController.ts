@@ -30,8 +30,7 @@ export class EquipesController {
 
     ipcMain.handle('addNovaEquipe', (_, doc: NewEquipeCustomer) => {
       try {
-        return {
-          success: true,
+        return {      
           data: this.model.add(doc)
         }
       } catch (error) {

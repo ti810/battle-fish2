@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Trophy, Users, UserCircle, Fish, Menu, X, Anchor } from 'lucide-react'
+import { Trophy, Users, UserCircle, AlignCenterVertical, Fish, Menu, X, Anchor } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 
@@ -9,6 +9,7 @@ import logo from '../assets/images/logo.png'
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
     { to: '/', icon: Trophy, label: 'Ranking' },
+    { to: '/campeonatos', icon: AlignCenterVertical, label: 'Campeonatos' },
     { to: '/equipes', icon: Fish, label: 'Equipes' },
     { to: '/atletas', icon: Users, label: 'Atletas' },
     { to: '/usuarios', icon: UserCircle, label: 'Usuários' }
@@ -39,8 +40,8 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
       >
         <div className="h-16 flex items-center justify-center border-b border-gray-100 bg-blue-600">
           <div className="flex items-center gap-2 text-white font-bold text-xl">
-            <img className="w-[50px] h-[50px] object-contain rounded-2xl" src={logo} />
-            {/* <Anchor className="w-6 h-6" /> */}
+            {/* <img className="w-12.5 h-12.5 object-contain rounded-2xl" src={logo} /> */}
+            <Anchor className="w-6 h-6" />
             <span>BattleFish</span>
           </div>
         </div>
