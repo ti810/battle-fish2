@@ -30,7 +30,7 @@ export class EquipesController {
 
     ipcMain.handle('addNovaEquipe', (_, doc: NewEquipeCustomer) => {
       try {
-        return {      
+        return {
           data: this.model.add(doc)
         }
       } catch (error) {
@@ -85,6 +85,18 @@ export class EquipesController {
         }
       } catch (error) {
         console.error('Erro ao buscar Equipe:', error)
+        throw error
+      }
+    })
+
+    ipcMain.handle('listarPeixesAndAtletasByEquipeId', (event, equipeId) => { 
+      try {
+        return {
+          success: true,
+          data: this.model.listarPeixesAtletasByEquipeId(equipeId)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados', error)
         throw error
       }
     })

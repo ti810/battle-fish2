@@ -43,19 +43,52 @@ export class EquipeModel {
 
   listarComUltimaCapturaOfPeixe() {
     const stmt = this.db.prepare(`
-    SELECT 
-      e.id,
-      e.nome,
-      e.ativo,
-      e.setor,    
-      e.criado_em,
-      MAX(p.criado_em) AS ultima_captura
-    FROM equipes e
-    LEFT JOIN peixes p 
-      ON p.id_equipe = e.id 
-     AND p.deletado_em IS NULL
-    GROUP BY e.id
-  `)
+      SELECT 
+        e.id,
+        e.nome,
+        e.ativo,
+        e.setor,    
+        e.criado_em,
+
+        -- Última captura
+        MAX(p.criado_em) AS ultima_captura,
+
+        -- Total de peixes
+        (
+          SELECT COUNT(*) 
+          FROM peixes p2 
+          WHERE p2.equipe_id = e.id 
+          AND p2.deletado_em IS NULL
+        ) AS total_peixes,
+
+        -- Total de atletas
+        (
+          SELECT COUNT(*) 
+          FROM atletas a 
+          WHERE a.equipe_id = e.id
+        ) AS total_atletas
+
+      FROM equipes e
+      LEFT JOIN peixes p 
+        ON p.equipe_id = e.id 
+      AND p.deletado_em IS NULL
+
+      GROUP BY e.id
+    `)
+    //   const stmt = this.db.prepare(`
+    //   SELECT
+    //     e.id,
+    //     e.nome,
+    //     e.ativo,
+    //     e.setor,
+    //     e.criado_em,
+    //     MAX(p.criado_em) AS ultima_captura
+    //   FROM equipes e
+    //   LEFT JOIN peixes p
+    //     ON p.equipe_id = e.id
+    //    AND p.deletado_em IS NULL
+    //   GROUP BY e.id
+    // `)
 
     return stmt.all()
   }
@@ -157,5 +190,21 @@ export class EquipeModel {
 
     const result = stmt.run(id)
     return result.changes > 0
+  }
+
+  listarPeixesAtletasByEquipeId(equipeId: number): EquipeCustomer[] {
+    const stmt = this.db.prepare(`
+      SELECT 
+        e.id,
+        e.nome,
+        COUNT(DISTINCT a.id) AS total_atletas,
+        COUNT(DISTINCT p.id) AS total_peixes
+      FROM equipes e
+      LEFT JOIN atletas a ON a.equipe_id = e.id
+      LEFT JOIN peixes p ON p.equipe_id = e.id
+      WHERE e.id = ?
+      GROUP BY e.id
+    `)
+    return stmt.all(equipeId) as EquipeCustomer[]
   }
 }

@@ -86,7 +86,7 @@ export class CampeonatoModel {
 
     return this.getById(data.id)
   }
-
+ 
   // add(data: NewCampeonatoCustomer, forcarEncerramento = false) {
   //   const campeonatoAtivo = this.getCampeonatoAtivo() as CampeonatoCustomer | undefined
 

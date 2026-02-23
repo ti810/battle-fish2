@@ -25,6 +25,20 @@ export class AtletaModel {
       )
     `)
   }
+
+
+    listarByEquipeId(equipeId: number): AtletaCustomer[] {
+      const stmt = this.db.prepare(`
+        SELECT a.id, a.nome, a.equipe_id
+        FROM atletas a
+        WHERE a.deletado_em IS NULL
+         AND a.equipe_id = ?
+        ORDER BY a.criado_em DESC
+      `)
+  
+      return stmt.all(equipeId) as AtletaCustomer[]
+    }
+
   add(data: NewAtletaCustomer): number {
     const stmt = this.db.prepare(`
         INSERT INTO atletas (nome, equipe_id) 

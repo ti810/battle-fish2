@@ -48,11 +48,13 @@ export interface EquipeCustomerComUltimaCaptura extends NewEquipeCustomer {
   qtde_atletas: number
   setor: number
   ultima_captura: string | null
+  total_peixes: number | null 
+  total_atletas: number | null
 }
 
 export interface NewPeixeCustomer {
   peso: string
-  id_equipe: number
+  equipe_id: number
   criado_em: string
 }
 

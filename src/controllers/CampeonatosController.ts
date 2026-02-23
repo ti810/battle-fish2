@@ -30,7 +30,6 @@ export class CampeonatosController {
     ipcMain.handle('verificarCampeonatoAtivo', async () => {
       try {
         return { ativo: this.model.getCampeonatoAtivo() ? true : false }
-
       } catch (error) {
         console.error('Erro ao verificar campeonato ativo:', error)
         throw error
@@ -97,5 +96,6 @@ export class CampeonatosController {
         throw error
       }
     })
+   
   }
 }

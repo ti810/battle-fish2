@@ -45,7 +45,11 @@ export default function Equipes() {
   const [equipes, setEquipes] = useState<EquipeCustomerComUltimaCaptura[]>([]);
   const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomerComUltimaCaptura | null>(null)
   const [isEquipeSelecionada, setIsEquipeSelecionada] = useState(false);
-  const [contagemPeixes, setContagemPeixes] = useState<Record<number, number>>({});
+  const [contagem, setContagem] = useState({
+    atletas: 0,
+    peixes: 0
+  })
+
 
   const [equipeId, setEquipeId] = useState<number | null>(null)
 
@@ -57,15 +61,22 @@ export default function Equipes() {
     criado_em: agoraParaSQLite(),
   });
 
-  const [peixeForm, setPeixeForm] = useState<NewPeixeCustomer | PeixeCustomer>({
+  const [peixeForm, setPeixeForm] = useState<{
+    peso: string
+    equipe_id: number | null
+    criado_em: string
+  }>({
     peso: "",
-    id_equipe: Number(null as number | null),
+    equipe_id: null,
     criado_em: agoraParaSQLite()
-  });
+  })
 
-  const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
-    nome: "",
-    equipe_id: Number(null as number | null),
+  const [atletaForm, setPesetAtletaFormixeForm] = useState<{
+    nome: string,
+    equipe_id: number | null
+  }>({
+    nome: "string",
+    equipe_id: null
   })
 
   const initialEquipeForm = {
@@ -239,7 +250,7 @@ export default function Equipes() {
           pesoRef.current?.focus()
         }
 
-        if (firstField === "id_equipe") {
+        if (firstField === "equipe_id") {
           idEquipeRef.current?.focus()
         }
         toast.error(
@@ -254,16 +265,27 @@ export default function Equipes() {
       }
       setLoading(true)
 
+      const pesoAtualizado = peixeForm.peso.replace(/[^0-9,]/g, '')
+      const peixeAtualizado = {
+        ...peixeForm,
+        peso: pesoAtualizado
+      }
 
-      const res = await window.api.addNovoPeixe(peixeForm as NewPeixeCustomer)
+      // console.log(peixeAtualizado)
+      // return
+
+
+      const res = await window.api.addNovoPeixe(peixeAtualizado as NewPeixeCustomer)
+
+
 
       if (res.success) {
         toast.success("Peixe salvo com sucesso")
         // Limpar valores dos Inputs 
         setPeixeForm({
-          id: Number(null as number | null),
+          id: null,
           peso: "",
-          id_equipe: Number(null as number | null),
+          equipe_id: Number(null as number | null),
           criado_em: ""
         })
         setShowAddPeixeModal(false)
@@ -282,29 +304,12 @@ export default function Equipes() {
   };
 
   const carregarDados = async () => {
-    const res = await window.api.listarEquipesComUltimaCaptura();
-
-    // console.log(res.data)
-    // return
+    const res = await window.api.listarEquipesComUltimaCaptura()
 
     if (res.success) {
-      setEquipes(res.data);
-
-      const resultados = await Promise.all(
-        res.data.map((equipe: { id: number; }) =>
-          window.api.listarPeixeByEquipeId(equipe.id)
-        )
-      );
-
-      const contagens: Record<number, number> = {};
-
-      resultados.forEach((r, index) => {
-        contagens[res.data[index].id] = r.success ? r.data.length : 0;
-      });
-
-      setContagemPeixes(contagens);
+      setEquipes(res.data)
     }
-  };
+  }
   // CRUD atleta
   const handleAddAtleta = async () => {
     try {
@@ -378,7 +383,7 @@ export default function Equipes() {
     if (equipeId) {
       setPeixeForm(prev => ({
         ...prev,
-        id_equipe: equipeId
+        equipe_id: equipeId
       }))
     }
   }, [equipeId]);
@@ -419,7 +424,7 @@ export default function Equipes() {
                   setIsEquipeSelecionada(false)
                   setPeixeForm(prev => ({
                     ...prev,
-                    id_equipe: 0
+                    equipe_id: 0
                   }));
                 }}
                 className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-green-200"
@@ -537,11 +542,11 @@ export default function Equipes() {
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   <div className="bg-gray-50 p-2 rounded-lg text-center">
                     <p className="text-xs text-gray-500">Integrantes</p>
-                    <p className="font-semibold text-gray-900">{equipe.qtde_atletas}</p>
+                    <p className="font-semibold text-gray-900">{equipe.total_atletas}</p>
                   </div>
                   <div className="bg-gray-50 p-2 rounded-lg text-center">
                     <p className="text-xs text-gray-500">Capturas</p>
-                    <p className="font-semibold text-blue-600">{contagemPeixes[equipe.id] ?? 0}</p>
+                    <p className="font-semibold text-blue-600">{equipe.total_peixes}</p>
                   </div>
                 </div>
 
@@ -554,7 +559,7 @@ export default function Equipes() {
                       setIsEquipeSelecionada(true)
                       setPeixeForm(prev => ({
                         ...prev,
-                        id_equipe: equipe.id
+                        equipe_id: equipe.id
                       }));
                       setShowAddPeixeModal(true)
 
@@ -603,13 +608,13 @@ export default function Equipes() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Equipe</label>
 
                     <select
-                      value={peixeForm.id_equipe ?? ""}
+                      value={peixeForm.equipe_id ?? ""}
                       onChange={(e) => {
                         setPeixeForm(prev => ({
                           ...prev,
-                          id_equipe: Number(e.target.value)
+                          equipe_id: Number(e.target.value)
                         }))
-                        setEquipeId(peixeForm.id_equipe)
+                        setEquipeId(peixeForm.equipe_id)
                       }}
                       className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                     >

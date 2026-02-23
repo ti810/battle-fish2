@@ -46,7 +46,7 @@ const api = {
   listarPeixe: () => ipcRenderer.invoke('listarPeixe'),
   listarPeixeById: (id: number) => ipcRenderer.invoke('listarPeixeById', id),
   deletarPeixe: (id: number) => ipcRenderer.invoke('deletarPeixe', id),
-  listarPeixeByEquipeId: (id: number) => ipcRenderer.invoke('listarPeixeByEquipeId', id),
+  listarPeixesAndAtletasByEquipeId: (id: number) => ipcRenderer.invoke('listarPeixesAndAtletasByEquipeId', id),
   editPeixeById: (doc: PeixeCustomer) => ipcRenderer.invoke('editPeixeById', doc),
   //Ranking
   listarRanking: () => ipcRenderer.invoke('listarRanking'),
