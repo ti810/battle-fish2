@@ -48,7 +48,7 @@ export const peixeSchema = z.object({
     .refine((val) => val > 150, {
       message: 'Peso deve ser maior que 150g'
     }),
-  id_equipe: z.number().min(1, 'Equipe é obrigatória')
+  equipe_id: z.number().min(1, 'Equipe é obrigatória')
 })
 
 export const atletaSchema = z.object({

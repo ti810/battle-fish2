@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 import Loader from '../components/Loader'
 import { RankingCustomer } from '~/src/shared/types/interfaces'
+import { formataPeso } from '../lib/utils'
 
 export default function Ranking() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] =
-    useState<'geral' | 'peso' | 'quantidade' | 'tamanho'>('geral')
+    useState<'geral' | 'quantidade'>('geral')
 
   const [teams, setTeams] = useState<RankingCustomer[]>([])
   const [isRevealed, setIsRevealed] = useState(false)
@@ -44,7 +45,7 @@ export default function Ranking() {
     async function loadRanking() {
       try {
         setLoading(true)
-        const data = await window.api.listarRanking()
+        const data = await window.api.listarRanking()   
         setTeams(data)
       } catch (err) {
         console.error('Erro ao carregar ranking', err)
@@ -63,19 +64,9 @@ export default function Ranking() {
   // ✅ SORT CORRETO
   const getSortedTeams = () => {
     switch (activeTab) {
-      case 'peso':
-        return [...teams].sort(
-          (a, b) => b.peso_total - a.peso_total
-        )
-
       case 'quantidade':
         return [...teams].sort(
           (a, b) => b.quantidade - a.quantidade
-        )
-
-      case 'tamanho':
-        return [...teams].sort(
-          (a, b) => b.tamanho - a.tamanho
         )
 
       default:
@@ -138,9 +129,9 @@ export default function Ranking() {
         <div className="flex flex-wrap gap-2 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit">
           {[
             { id: 'geral', label: 'Geral', icon: Trophy },
-            { id: 'peso', label: 'Maior Peso', icon: Scale },
-            { id: 'quantidade', label: 'Quantidade', icon: Hash },
-            { id: 'tamanho', label: 'Maior Peixe', icon: Ruler }
+            { id: 'quantidade', label: 'Maior Quantidade', icon: Hash },
+            // { id: 'quantidade', label: 'Quantidade', icon: Hash },
+            // { id: 'tamanho', label: 'Maior Peixe', icon: Ruler }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -251,7 +242,7 @@ export default function Ranking() {
               Peso Total
             </div>
             <div className="col-span-2 text-right hidden md:block">
-              Qtd
+              Qtd de peixes
             </div>
             <div className="col-span-2 text-right">
               Pontos
@@ -261,7 +252,7 @@ export default function Ranking() {
           <div className="divide-y">
             {sortedTeams.map((team, index) => (
               <motion.div
-                key={team.id}
+                key={index}
                 className="grid grid-cols-12 gap-4 p-4 items-center"
               >
                 <div className="col-span-1 text-center">
@@ -275,14 +266,14 @@ export default function Ranking() {
                       : '•••••'}
                   </p>
 
-                  <p className="text-xs text-gray-400 md:hidden">
+                  {/* <p className="text-xs text-gray-400 md:hidden">
                     {maskValue(team.peso_total.toFixed(1))}kg •{' '}
                     {maskValue(team.quantidade)} peixes
-                  </p>
+                  </p> */}
                 </div>
 
                 <div className="col-span-2 text-right hidden md:block">
-                  {maskValue(team.peso_total.toFixed(1))}kg
+                  {maskValue(formataPeso(team.peso_total))}
                 </div>
 
                 <div className="col-span-2 text-right hidden md:block">

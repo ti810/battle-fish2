@@ -67,6 +67,7 @@ export interface RankingCustomer{
   peso_total: number
   quantidade: number
   tamanho: number
+  pontos: number
 }
 
 

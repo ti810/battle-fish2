@@ -13,7 +13,7 @@ export class PeixeModel {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS peixes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,       
-        peso REAL, 
+        peso REAL NOT NULL, 
         equipe_id INTEGER NOT NULL,      
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,

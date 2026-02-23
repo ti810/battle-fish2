@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Search, Fish, MoreVertical, Scale, Ruler, Users, Edit2, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { agoraParaSQLite, tempoRelativo } from '../lib/utils';
-import { NewEquipeCustomer, PeixeCustomer, NewPeixeCustomer, EquipeCustomer, EquipeCustomerComUltimaCaptura, NewAtletaCustomer } from '~/src/shared/types/interfaces';
+import { NewEquipeCustomer, PeixeCustomer, NewPeixeCustomer, EquipeCustomer, EquipeCustomerComUltimaCaptura, NewAtletaCustomer, AtletaCustomer } from '~/src/shared/types/interfaces';
 import { toast } from 'sonner';
 import Loader from '../components/Loader';
 import { formValidation } from '../hooks/formValidation';
@@ -61,28 +61,21 @@ export default function Equipes() {
     criado_em: agoraParaSQLite(),
   });
 
-  const [peixeForm, setPeixeForm] = useState<{
-    peso: string
-    equipe_id: number | null
-    criado_em: string
-  }>({
+  const [peixeForm, setPeixeForm] = useState<NewPeixeCustomer | PeixeCustomer>({
     peso: "",
-    equipe_id: null,
+    equipe_id: 0,
     criado_em: agoraParaSQLite()
   })
 
-  const [atletaForm, setPesetAtletaFormixeForm] = useState<{
-    nome: string,
-    equipe_id: number | null
-  }>({
-    nome: "string",
-    equipe_id: null
-  })
+  const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer | AtletaCustomer>({
+    nome: "",
+    equipe_id: 0,
+    criado_em: agoraParaSQLite()
+  });
 
   const initialEquipeForm = {
-    id: Number("" as number | ""),
     nome: "",
-    setor: Number("" as number | ""),
+    setor: 0,
     criado_em: "",
   }
 
@@ -265,7 +258,9 @@ export default function Equipes() {
       }
       setLoading(true)
 
-      const pesoAtualizado = peixeForm.peso.replace(/[^0-9,]/g, '')
+      // const pesoAtualizado = peixeForm.peso.replace(/[^0-9,]/g, '')  deixa , 
+      // const pesoAtualizado = peixeForm.peso.replace(/[^0-9.]/g, '') // deixa .
+      const pesoAtualizado = peixeForm.peso.replace(/[^0-9]/g, '') // deixa apenas números
       const peixeAtualizado = {
         ...peixeForm,
         peso: pesoAtualizado
@@ -283,7 +278,6 @@ export default function Equipes() {
         toast.success("Peixe salvo com sucesso")
         // Limpar valores dos Inputs 
         setPeixeForm({
-          id: null,
           peso: "",
           equipe_id: Number(null as number | null),
           criado_em: ""
@@ -947,6 +941,7 @@ export default function Equipes() {
                             nome: e.target.value
                           })
                         }}
+                        placeholder='Ex: João da Silva'
                         className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                       />
                     </div>
