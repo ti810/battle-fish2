@@ -31,7 +31,7 @@ export interface AtletaCustomer {
 export interface NewEquipeCustomer {
   nome: string
   ativo?: number
-  setor: number
+  setor?: number
   criado_em?: string
   id_campeonato?: number
   atualizado_em?: string
@@ -46,7 +46,7 @@ export interface EquipeCustomerComUltimaCaptura extends NewEquipeCustomer {
   nome: string
   ativo?: number
   qtde_atletas: number
-  setor: number
+  setor?: number
   ultima_captura: string | null
   total_peixes: number | null 
   total_atletas: number | null

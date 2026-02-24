@@ -1,17 +1,24 @@
-import DatabaseConstructor from 'better-sqlite3'
-import { EquipeCustomer, NewEquipeCustomer, PeixeCustomer } from '../shared/types/interfaces'
-import z from 'zod'
-import { equipeSchema } from '../renderer/src/hooks/formValidation'
-import { error } from 'console'
+import DatabaseConstructor from "better-sqlite3";
+import {
+  EquipeCustomer,
+  NewEquipeCustomer,
+  PeixeCustomer,
+} from "../shared/types/interfaces";
+import z from "zod";
+import { equipeSchema } from "../renderer/src/hooks/formValidation";
+import { error } from "console";
+import { Await } from "react-router-dom";
 
-type ModelResponse<T> = { success: true; data: T } | { success: false; message: any }
+type ModelResponse<T> =
+  | { success: true; data: T }
+  | { success: false; message: any };
 
 export class EquipeModel {
-  private db: InstanceType<typeof DatabaseConstructor>
+  private db: InstanceType<typeof DatabaseConstructor>;
 
   constructor(db: InstanceType<typeof DatabaseConstructor>) {
-    this.db = db
-    this.criarTabela()
+    this.db = db;
+    this.criarTabela();
   }
 
   private criarTabela() {
@@ -19,7 +26,7 @@ export class EquipeModel {
       CREATE TABLE IF NOT EXISTS equipes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        setor INTEGER NOT NULL UNIQUE,
+        setor INTEGER DEFAULT NULL,
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
@@ -28,7 +35,7 @@ export class EquipeModel {
           REFERENCES campeonatos(id)
           ON DELETE CASCADE       
       )
-    `)
+    `);
   }
 
   listar(): EquipeCustomer[] {
@@ -36,9 +43,9 @@ export class EquipeModel {
       SELECT id, nome, setor, ativo, criado_em, id_campeonato
       FROM equipes      
       ORDER BY criado_em DESC
-    `)
+    `);
 
-    return stmt.all() as EquipeCustomer[]
+    return stmt.all() as EquipeCustomer[];
   }
 
   listarComUltimaCapturaOfPeixe() {
@@ -57,8 +64,7 @@ export class EquipeModel {
         (
           SELECT COUNT(*) 
           FROM peixes p2 
-          WHERE p2.equipe_id = e.id 
-          AND p2.deletado_em IS NULL
+          WHERE p2.equipe_id = e.id           
         ) AS total_peixes,
 
         -- Total de atletas
@@ -70,11 +76,9 @@ export class EquipeModel {
 
       FROM equipes e
       LEFT JOIN peixes p 
-        ON p.equipe_id = e.id 
-      AND p.deletado_em IS NULL
-
+        ON p.equipe_id = e.id      
       GROUP BY e.id
-    `)
+    `);
     //   const stmt = this.db.prepare(`
     //   SELECT
     //     e.id,
@@ -90,55 +94,119 @@ export class EquipeModel {
     //   GROUP BY e.id
     // `)
 
-    return stmt.all()
+    return stmt.all();
   }
 
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       SELECT id, nome, ativo, setor, criado_em, id_campeonato
       FROM equipes
-      WHERE deletado_em IS NULL
-        AND id = ?
+      WHERE id = ?
       LIMIT 1
-    `)
+    `);
 
-    return stmt.get(id) as EquipeCustomer
+    return stmt.get(id) as EquipeCustomer;
   }
 
-  edit(data: EquipeCustomer): EquipeCustomer | null {
-    const stmt = this.db.prepare(`
-      UPDATE equipes
-      SET nome = ?, setor = ?, ativo = ?, id_campeonato = ?
-      WHERE id = ?
-    `)
+  edit(data: EquipeCustomer): ModelResponse<EquipeCustomer> | null {
+    // 🔎 Verifica duplicidade de setor
+    if (data.setor != null) {
+      const existe = this.db
+        .prepare(
+          `
+        SELECT id 
+        FROM equipes 
+        WHERE setor = ? 
+          AND id != ?
+      `
+        )
+        .get(data.setor, data.id);
 
-    const result = stmt.run(data.nome, data.setor, data.ativo, data.id_campeonato, data.id)
-    if (result.changes === 0) {
-      return null
+      if (existe) {
+        return {
+          success: false,
+          message: "Já existe uma equipe cadastrada para este setor.",
+        };
+      }
     }
 
-    return this.getById(data.id)
+    const stmt = this.db.prepare(`
+    UPDATE equipes
+    SET nome = ?, setor = ?, ativo = ?, id_campeonato = ?
+    WHERE id = ?
+  `);
+
+    const result = stmt.run(
+      data.nome,
+      data.setor ?? null,
+      data.ativo,
+      data.id_campeonato,
+      data.id
+    );
+
+    if (result.changes === 0) {
+      return {
+        success: false,
+        message: 'Erro ao salvar dados desta Equipe'
+      };
+    }
+
+    const equipe = this.getById(data.id);
+
+    return {
+      success: true,
+      data: equipe as EquipeCustomer
+    };
   }
+
+  // edit(data: EquipeCustomer): EquipeCustomer | null {
+
+  //   const stmt = this.db.prepare(`
+  //     UPDATE equipes
+  //     SET nome = ?, setor = ?, ativo = ?, id_campeonato = ?
+  //     WHERE id = ?
+  //   `);
+
+  //   const result = stmt.run(
+  //     data.nome,
+  //     data.setor,
+  //     data.ativo,
+  //     data.id_campeonato,
+  //     data.id
+  //   );
+  //   if (result.changes === 0) {
+  //     return null;
+  //   }
+
+  //   return this.getById(data.id);
+  // }
 
   add(data: NewEquipeCustomer): ModelResponse<NewEquipeCustomer> {
     // validação zod
-    const parsed = equipeSchema.safeParse(data)
+    const parsed = equipeSchema.safeParse(data);
 
     if (!parsed.success) {
       return {
         success: false,
-        message: parsed.error.flatten()
-      }
+        message: parsed.error.flatten(),
+      };
     }
 
     // // 🔎 Verifica se já existe setor
-    const existe = this.db.prepare('SELECT id FROM equipes WHERE setor = ?').get(parsed.data.setor)
+
+    let existe = null;
+
+    if (parsed.data.setor !== null && parsed.data.setor !== undefined) {
+      existe = this.db
+        .prepare("SELECT id FROM equipes WHERE setor = ?")
+        .get(parsed.data.setor);
+    }
 
     if (existe) {
       return {
         success: false,
-        message: 'Já existe uma equipe cadastrada para este setor.'
-      }
+        message: "Já existe uma equipe cadastrada para este setor.",
+      };
     }
 
     // 1️⃣ verificar campeonato ativo
@@ -150,21 +218,27 @@ export class EquipeModel {
         LIMIT 1
       `
       )
-      .get() as { id: number } | undefined
+      .get() as { id: number } | undefined;
 
     if (!campeonatoAtivo) {
       return {
         success: false,
-        message: 'Nenhum campeonato ativo encontrado'
-      }
+        message: "Nenhum campeonato ativo encontrado",
+      };
     }
 
     const stmt = this.db.prepare(`
       INSERT INTO equipes (nome, ativo, setor, criado_em, id_campeonato)
       VALUES (?, ?, ?, ?, ?)
-    `)
+    `);
 
-    const res = stmt.run(data.nome, data.ativo ?? 1, data.setor, data.criado_em, campeonatoAtivo.id)
+    const res = stmt.run(
+      data.nome,
+      data.ativo ?? 1,
+      data.setor,
+      data.criado_em,
+      campeonatoAtivo.id
+    );
 
     const equipe = this.db
       .prepare(
@@ -174,22 +248,22 @@ export class EquipeModel {
       WHERE id = ?
     `
       )
-      .get(res.lastInsertRowid) as NewEquipeCustomer
+      .get(res.lastInsertRowid) as NewEquipeCustomer;
 
     return {
       success: true,
-      data: equipe
-    }
+      data: equipe,
+    };
   }
 
   delete(id: number): boolean {
     const stmt = this.db.prepare(`
       DELETE from equipes 
       WHERE id = ?
-    `)
+    `);
 
-    const result = stmt.run(id)
-    return result.changes > 0
+    const result = stmt.run(id);
+    return result.changes > 0;
   }
 
   listarPeixesAtletasByEquipeId(equipeId: number): EquipeCustomer[] {
@@ -204,7 +278,7 @@ export class EquipeModel {
       LEFT JOIN peixes p ON p.equipe_id = e.id
       WHERE e.id = ?
       GROUP BY e.id
-    `)
-    return stmt.all(equipeId) as EquipeCustomer[]
+    `);
+    return stmt.all(equipeId) as EquipeCustomer[];
   }
 }

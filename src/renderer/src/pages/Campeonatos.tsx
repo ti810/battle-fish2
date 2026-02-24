@@ -33,6 +33,7 @@ export default function Campeonatos() {
   const dataFinalRef = useRef<HTMLInputElement>(null)
   const idEquipeRef = useRef<HTMLInputElement>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [equipesCount, setEquipesCount] = useState<Record<number, number>>({})
 
   const [campeonatos, setCampeonatos] = useState<CampeonatoCustomer[]>([])
 
@@ -49,9 +50,6 @@ export default function Campeonatos() {
 
   const handleEditCampeonato = async () => {
     try {
-
-
-      console.log("Dados do formulário do Campeonato para edição:", campeonatoForm)
 
       // const validationRules = await formValidation(campeonatoSchema, campeonatoForm)
 
@@ -198,6 +196,20 @@ export default function Campeonatos() {
 
   };
 
+  const carregarDados = async () => {
+    const res = await window.api.listarCampeonatos();
+
+    if (!res.success) return;
+
+    setCampeonatos(res.data);
+
+    const equipes = await Promise.all(
+      res.data.map(async (campeonato: { id: number }) => window.api.listarEquipesByCampeonatoId(campeonato.id))
+    )
+
+    setEquipesCount((equipes[0].data.totalEquipes))
+  };
+
   // const handleDeletarEquipe = async () => {
   //   try {
   //     setLoading(true)
@@ -287,32 +299,7 @@ export default function Campeonatos() {
 
   //   };
 
-  const carregarDados = async () => {
-    const res = await window.api.listarCampeonatos();
 
-    // console.log(res.data)
-    // return
-
-    if (res.success) {
-      setCampeonatos(res.data);
-
-      const equipesCampeonato = await Promise.all(
-        res.data.map((campeonato: { id: number; }) =>
-          window.api.listarEquipesByCampeonatoId(campeonato.id)
-        )
-      );
-
-      console.log(equipesCampeonato);
-
-      // const contagens: Record<number, number> = {};
-
-      // resultados.forEach((r, index) => {
-      //   contagens[res.data[index].id] = r.success ? r.data.length : 0;
-      // });
-
-      // setContagemPeixes(contagens);
-    }
-  };
   // // CRUD atleta
   // const handleAddAtleta = async () => {
   //     try {
@@ -468,7 +455,7 @@ export default function Campeonatos() {
                 <div
                   className="text-gray-600 flex items-center gap-1"
                 >
-                  <span className='flex font-semibold from-green-600 to-gray-600 bg-linear-to-l w-7 h-7 rounded-full justify-center items-center text-white text-lg'>15</span> Equipes participando no momento
+                  <span className='flex font-semibold from-green-600 to-gray-600 bg-linear-to-l w-7 h-7 rounded-full justify-center items-center text-white text-lg'>{Number(equipesCount)}</span> Equipe{Number(equipesCount) > 1 && "s"} participando no momento
                 </div>
                 <button
                   onClick={() => navigate("/equipes?", { state: { openModal: true } })}

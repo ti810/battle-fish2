@@ -14,7 +14,6 @@ import { PeixesController } from "../controllers/PeixesController";
 import { RankingController } from "../controllers/RankingController";
 import { CampeonatosController } from "../controllers/CampeonatosController";
 import { fa } from "zod/locales";
-// const db = new Database('./src/database/app.db') DB modo DEV
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -79,16 +78,16 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  const userDataPath = app.getPath("userData");
-  const dbPath = path.join(userDataPath, "app.db");
-  const db = new Database(dbPath);
+  // const userDataPath = app.getPath("userData");
+  // const dbPath = path.join(userDataPath, "app.db");
+  // const db = new Database(dbPath);
 
-  console.log(userDataPath, dbPath);
+  // if (!fs.existsSync(dbPath)) {
+  //   const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
+  //   fs.copyFileSync(sourceDbPath, dbPath);
+  // }
 
-  if (!fs.existsSync(dbPath)) {
-    const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
-    fs.copyFileSync(sourceDbPath, dbPath);
-  }
+  const db = new Database("./src/database/app.db"); //DB modo DEV
 
   new UsuariosController(db);
   new CampeonatosController(db);

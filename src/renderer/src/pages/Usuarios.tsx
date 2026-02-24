@@ -34,15 +34,6 @@ export default function Usuarios() {
     listarUsuarios()
   }, [])
 
-  useEffect(() => {
-    console.log(usuarios)
-  }, [usuarios])
-
-
-
-
-
-
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

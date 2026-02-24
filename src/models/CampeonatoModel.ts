@@ -1,19 +1,21 @@
-import DatabaseConstructor from 'better-sqlite3'
+import DatabaseConstructor from "better-sqlite3";
 import {
   CampeonatoCustomer,
   NewCampeonatoCustomer,
-  EquipeCustomer
-} from '../shared/types/interfaces'
-import z from 'zod'
+  EquipeCustomer,
+} from "../shared/types/interfaces";
+import z from "zod";
 
-type ModelResponse<T> = { success: true; data: T } | { success: false; message: string }
+type ModelResponse<T> =
+  | { success: true; data: T }
+  | { success: false; message: string };
 
 export class CampeonatoModel {
-  private db: InstanceType<typeof DatabaseConstructor>
+  private db: InstanceType<typeof DatabaseConstructor>;
 
   constructor(db: InstanceType<typeof DatabaseConstructor>) {
-    this.db = db
-    this.criarTabela()
+    this.db = db;
+    this.criarTabela();
   }
 
   private criarTabela() {
@@ -26,7 +28,7 @@ export class CampeonatoModel {
         ativo INTEGER DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP  
       )
-    `)
+    `);
   }
 
   listar(): CampeonatoCustomer[] {
@@ -34,9 +36,9 @@ export class CampeonatoModel {
       SELECT id, nome, data_inicial, data_final, ativo, criado_em
       FROM campeonatos
       ORDER BY criado_em DESC
-    `)
+    `);
 
-    return stmt.all() as CampeonatoCustomer[]
+    return stmt.all() as CampeonatoCustomer[];
   }
 
   getCampeonatoAtivo() {
@@ -44,9 +46,9 @@ export class CampeonatoModel {
       SELECT id FROM campeonatos
       WHERE ativo = 1
       LIMIT 1
-  `)
+  `);
 
-    return stmt.get()
+    return stmt.get();
   }
 
   getById(id: number): CampeonatoCustomer | null {
@@ -56,20 +58,33 @@ export class CampeonatoModel {
       WHERE deletado_em IS NULL
         AND id = ?
       LIMIT 1
-    `)
+    `);
 
-    return stmt.get(id) as CampeonatoCustomer
+    return stmt.get(id) as CampeonatoCustomer;
   }
 
   listarEquipesByCampeonatoId(id: number) {
-    const stmt = this.db.prepare(`
-      SELECT e.id, e.nome, e.setor, e.criado_em
-      FROM equipes e
-      JOIN campeonatos c ON e.id_campeonato = c.id
-      WHERE c.id = ?
-    `)
+    const equipes = this.db
+      .prepare(`
+        SELECT e.id, e.nome, e.setor, e.criado_em      
+        FROM equipes e      
+        WHERE e.id_campeonato = ?
+    `
+      ).all(id);
 
-    return stmt.all(id) as EquipeCustomer[]
+    const total = this.db
+      .prepare(
+      `
+        SELECT COUNT(*) 
+        FROM equipes 
+        WHERE id_campeonato = ?
+      `
+      ).pluck().get(id);
+
+    return {
+      totalEquipes: String(total),
+      equipes: equipes as EquipeCustomer[],
+    };
   }
 
   edit(data: CampeonatoCustomer): CampeonatoCustomer | null {
@@ -77,16 +92,22 @@ export class CampeonatoModel {
       UPDATE campeonatos
       SET nome = ?, data_inicial = ?, data_final = ?, ativo = ?      
       WHERE id = ?      
-    `)
+    `);
 
-    const result = stmt.run(data.nome, data.data_inicial, data.data_final, data.ativo, data.id)
+    const result = stmt.run(
+      data.nome,
+      data.data_inicial,
+      data.data_final,
+      data.ativo,
+      data.id
+    );
     if (result.changes === 0) {
-      return null
+      return null;
     }
 
-    return this.getById(data.id)
+    return this.getById(data.id);
   }
- 
+
   // add(data: NewCampeonatoCustomer, forcarEncerramento = false) {
   //   const campeonatoAtivo = this.getCampeonatoAtivo() as CampeonatoCustomer | undefined
 
@@ -172,34 +193,42 @@ export class CampeonatoModel {
 
   add(data: NewCampeonatoCustomer): NewCampeonatoCustomer {
     const transaction = this.db.transaction(() => {
-      this.db.prepare(`DELETE FROM campeonatos`).run()
+      this.db.prepare(`DELETE FROM campeonatos`).run();
 
       const stmt = this.db.prepare(`
       INSERT INTO campeonatos (nome, data_inicial, data_final, ativo, criado_em)
       VALUES (?, ?,  ?, ?, ?)
-    `)
+    `);
 
-      const res = stmt.run(data.nome, data.data_inicial, data.data_final, 1, data.criado_em)
+      const res = stmt.run(
+        data.nome,
+        data.data_inicial,
+        data.data_final,
+        1,
+        data.criado_em
+      );
 
-      return this.db.prepare(
-      `
+      return this.db
+        .prepare(
+          `
         SELECT id, nome, data_inicial, data_final, criado_em
         FROM campeonatos
         WHERE id = ?
       `
-      ) .get(res.lastInsertRowid)
-    })
+        )
+        .get(res.lastInsertRowid);
+    });
 
-    return transaction() as NewCampeonatoCustomer
+    return transaction() as NewCampeonatoCustomer;
   }
 
   encerrar(id: number): boolean {
     const stmt = this.db.prepare(`
       DELETE from campeonatos
       WHERE id = ?
-    `)
+    `);
 
-    const result = stmt.run(id)
-    return result.changes > 0
+    const result = stmt.run(id);
+    return result.changes > 0;
   }
 }

@@ -56,8 +56,7 @@ export default function Equipes() {
 
   // Form states
   const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
-    nome: "",
-    setor: 0,
+    nome: "",  
     criado_em: agoraParaSQLite(),
   });
 
@@ -74,8 +73,7 @@ export default function Equipes() {
   });
 
   const initialEquipeForm = {
-    nome: "",
-    setor: 0,
+    nome: "",   
     criado_em: "",
   }
 
@@ -99,8 +97,6 @@ export default function Equipes() {
         if (firstField === "setor") {
           setorRef.current?.focus()
         }
-
-
         toast.error(
           <div className="space-y-1">
             {Object.values(validationRules.fieldErrors).map((err, index) => (
@@ -118,15 +114,17 @@ export default function Equipes() {
         return
       }
 
-      const res = await window.api.editEquipeById(equipeForm as EquipeCustomer)
+      const res = await window.api.editEquipeById(equipeForm as EquipeCustomer)    
 
-      if (res.success) {
-        toast.success("Equipe salvo com sucesso")
+      if (res.data.success) {
+        toast.success("Equipe alterada com sucesso")
         // Limpar valores dos Inputs 
         setEquipeForm(initialEquipeForm)
         setShowEditEquipeModal(false)
         carregarDados()
 
+      }else{
+         toast.error(res.data.message)
       }
 
     } catch (error) {
@@ -427,7 +425,10 @@ export default function Equipes() {
                 Cadastrar Peixe
               </button>
               <button
-                onClick={() => setShowAddEquipeModal(true)}
+                onClick={() => {
+                  setShowAddEquipeModal(true)
+                  setEquipeForm({nome: ""})
+                }}
                 className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
               >
                 <Users className="w-4 h-4" />
@@ -760,7 +761,7 @@ export default function Equipes() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Setor <span className='text-red-600'>*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
                     <input
                       type="number"
                       ref={setorRef}
@@ -829,11 +830,11 @@ export default function Equipes() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Setor <span className='text-red-600'>*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
                     <input
                       type="number"
                       ref={setorRef}
-                      value={equipeForm.setor}
+                      value={equipeForm.setor ?? ""}
                       onChange={(e) => {
                         setEquipeForm({ ...equipeForm, setor: Number(e.target.value) })
                         setFieldErrors((prev) => {

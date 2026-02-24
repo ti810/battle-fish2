@@ -22,11 +22,7 @@ export default function Atletas() {
     nome: '',
     equipe_id: 0
   })
-
-
-  useEffect(() => {
-    console.log(equipeSelecionada)
-  },[equipeSelecionada])
+ 
 
   useEffect(() => {
     loadAtletas()
@@ -112,7 +108,7 @@ export default function Atletas() {
       defaultId: 1,
       cancelId: 1,
       title: 'Deseja Exluir?',
-      message: `Tem certeza que deseja excluir este atleta? " #${atletaForm.nome}#`,
+      message: `Tem certeza que deseja excluir este atleta? " *** ${atletas.find(a => a.id === id)?.nome.toUpperCase()} ***`,
     })
 
     if (resposta.response === 0) {
