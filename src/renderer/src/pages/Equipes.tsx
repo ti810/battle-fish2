@@ -612,7 +612,7 @@ export default function Equipes() {
                       }}
                       className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
                     >
-                      <option disabled value={0}>Selecione um equipe...</option>
+                      <option disabled value={0}>Selecione uma equipe...</option>
                       {equipeSelecionada && isEquipeSelecionada ? (
                         <option value={equipeSelecionada.id as number}>
                           {equipeSelecionada.nome}

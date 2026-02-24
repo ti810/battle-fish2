@@ -36,11 +36,11 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
-      devTools: false
+      // devTools: false
     },
   });
 
-  // mainWindow.webContents.openDevTools({ mode: "right" }); // Abrir com DevTools aberto
+  mainWindow.webContents.openDevTools({ mode: "right" }); // Abrir com DevTools aberto
 
   mainWindow.setMenu(null);
 
