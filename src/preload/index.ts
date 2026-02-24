@@ -1,7 +1,17 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { NewEquipeCustomer, NewUserCustomer, NewPeixeCustomer, EquipeCustomer, NewAtletaCustomer, AtletaCustomer, PeixeCustomer } from '../shared/types/interfaces'
+import {
+  NewEquipeCustomer,
+  NewUserCustomer,
+  NewPeixeCustomer,
+  EquipeCustomer,
+  NewAtletaCustomer,
+  AtletaCustomer,
+  PeixeCustomer,
+  CampeonatoCustomer,
+  NewCampeonatoCustomer
+} from '../shared/types/interfaces'
 
 declare global {
   export interface Window {
@@ -40,6 +50,18 @@ const api = {
   editPeixeById: (doc: PeixeCustomer) => ipcRenderer.invoke('editPeixeById', doc),
   //Ranking
   listarRanking: () => ipcRenderer.invoke('listarRanking'),
+  // Campeonatos
+  // listarRankingPorCampeonato: (id: number) => ipcRenderer.invoke('listarRankingPorCampeonato', id),
+  verificarCampeonatoAtivo: () => ipcRenderer.invoke('verificarCampeonatoAtivo'),
+  addNovoCampeonato: (doc: NewCampeonatoCustomer) => ipcRenderer.invoke('addNovoCampeonato', doc),
+  editCampeonatoById: (doc: CampeonatoCustomer) => ipcRenderer.invoke('editCampeonatoById', doc),
+  deletarCampeonato: (id: number) => ipcRenderer.invoke('deletarCampeonato', id),
+  listarCampeonatos: () => ipcRenderer.invoke('listarCampeonatos'),
+  listarEquipesByCampeonatoId: (id: number) => ipcRenderer.invoke('listarEquipesByCampeonatoId', id),
+
+  // Message Box 
+  showMessageBox: (options: Electron.MessageBoxOptions) => ipcRenderer.invoke('show-message-box', options)
+
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

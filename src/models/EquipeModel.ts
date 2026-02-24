@@ -1,6 +1,10 @@
 import DatabaseConstructor from 'better-sqlite3'
 import { EquipeCustomer, NewEquipeCustomer, PeixeCustomer } from '../shared/types/interfaces'
 import z from 'zod'
+import { equipeSchema } from '../renderer/src/hooks/formValidation'
+import { error } from 'console'
+
+type ModelResponse<T> = { success: true; data: T } | { success: false; message: any }
 
 export class EquipeModel {
   private db: InstanceType<typeof DatabaseConstructor>
@@ -15,21 +19,22 @@ export class EquipeModel {
       CREATE TABLE IF NOT EXISTS equipes(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        setor INTERGER NOT NULL,
-        qtde_atletas INTEGER NOT NULL,
+        setor INTEGER NOT NULL UNIQUE,
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
-        deletado_em TEXT       
+        id_campeonato INTEGER NOT NULL,
+        FOREIGN KEY (id_campeonato)
+          REFERENCES campeonatos(id)
+          ON DELETE CASCADE       
       )
     `)
   }
 
   listar(): EquipeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, qtde_atletas, criado_em
-      FROM equipes
-      WHERE deletado_em IS NULL
+      SELECT id, nome, setor, ativo, criado_em, id_campeonato
+      FROM equipes      
       ORDER BY criado_em DESC
     `)
 
@@ -42,8 +47,7 @@ export class EquipeModel {
       e.id,
       e.nome,
       e.ativo,
-      e.setor,
-      e.qtde_atletas,
+      e.setor,    
       e.criado_em,
       MAX(p.criado_em) AS ultima_captura
     FROM equipes e
@@ -58,7 +62,7 @@ export class EquipeModel {
 
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
-      SELECT id, nome, ativo, setor, qtde_atletas, criado_em
+      SELECT id, nome, ativo, setor, criado_em, id_campeonato
       FROM equipes
       WHERE deletado_em IS NULL
         AND id = ?
@@ -71,11 +75,11 @@ export class EquipeModel {
   edit(data: EquipeCustomer): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       UPDATE equipes
-      SET nome = ?, qtde_atletas = ?, setor = ?      
-      WHERE id = ?      
+      SET nome = ?, setor = ?, ativo = ?, id_campeonato = ?
+      WHERE id = ?
     `)
 
-    const result = stmt.run(data.nome, data.qtde_atletas, data.setor, data.id)
+    const result = stmt.run(data.nome, data.setor, data.ativo, data.id_campeonato, data.id)
     if (result.changes === 0) {
       return null
     }
@@ -83,21 +87,66 @@ export class EquipeModel {
     return this.getById(data.id)
   }
 
-  add(data: NewEquipeCustomer): NewEquipeCustomer {
+  add(data: NewEquipeCustomer): ModelResponse<NewEquipeCustomer> {
+    // validação zod
+    const parsed = equipeSchema.safeParse(data)
+
+    if (!parsed.success) {
+      return {
+        success: false,
+        message: parsed.error.flatten()
+      }
+    }
+
+    // // 🔎 Verifica se já existe setor
+    const existe = this.db.prepare('SELECT id FROM equipes WHERE setor = ?').get(parsed.data.setor)
+
+    if (existe) {
+      return {
+        success: false,
+        message: 'Já existe uma equipe cadastrada para este setor.'
+      }
+    }
+
+    // 1️⃣ verificar campeonato ativo
+    const campeonatoAtivo = this.db
+      .prepare(
+        `
+        SELECT id FROM campeonatos
+        WHERE ativo = 1
+        LIMIT 1
+      `
+      )
+      .get() as { id: number } | undefined
+
+    if (!campeonatoAtivo) {
+      return {
+        success: false,
+        message: 'Nenhum campeonato ativo encontrado'
+      }
+    }
+
     const stmt = this.db.prepare(`
-      INSERT INTO equipes (nome, ativo, setor, criado_em, qtde_atletas) 
+      INSERT INTO equipes (nome, ativo, setor, criado_em, id_campeonato)
       VALUES (?, ?, ?, ?, ?)
     `)
 
-    const res = stmt.run(data.nome, data.ativo ?? 1, data.setor, data.criado_em, data.qtde_atletas)
+    const res = stmt.run(data.nome, data.ativo ?? 1, data.setor, data.criado_em, campeonatoAtivo.id)
 
-    const select = this.db.prepare(`
-      SELECT id, nome, ativo, setor, criado_em, qtde_atletas
+    const equipe = this.db
+      .prepare(
+        `
+      SELECT id, nome, ativo, setor, criado_em, id_campeonato
       FROM equipes
       WHERE id = ?
-    `)
+    `
+      )
+      .get(res.lastInsertRowid) as NewEquipeCustomer
 
-    return select.get(res.lastInsertRowid) as NewEquipeCustomer
+    return {
+      success: true,
+      data: equipe
+    }
   }
 
   delete(id: number): boolean {

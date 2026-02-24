@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import path from 'node:path'
 import { createTray } from './tray'
+import { dialog } from 'electron'
 
 import Database from 'better-sqlite3'
 import { UsuariosController } from '../controllers/UsuariosController'
@@ -10,6 +11,7 @@ import { EquipesController } from '../controllers/EquipesController'
 import { AtletasController } from '../controllers/AtletasController'
 import { PeixesController } from '../controllers/PeixesController'
 import { RankingController } from '../controllers/RankingController'
+import { CampeonatosController } from '../controllers/CampeonatosController'
 const db = new Database('./src/database/app.db')
 
 let mainWindow: BrowserWindow | null = null
@@ -71,9 +73,10 @@ app.whenReady().then(() => {
   // const dbPath = path.join(__dirname, '..', 'database', 'app.db')
   // const db = new Database(dbPath)
   new UsuariosController(db)
+  new CampeonatosController(db)
   new EquipesController(db)
   new AtletasController(db)
-  new PeixesController(db);
+  new PeixesController(db)
   new RankingController(db)
 
   electronApp.setAppUserModelId('com.electron')
@@ -98,6 +101,13 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+// Message Box 
+
+ipcMain.handle('show-message-box', async (event, options) => {
+  const result = await dialog.showMessageBox(options)
+  return result
 })
 
 // In this file you can include the rest of your app's specific main process

@@ -31,11 +31,10 @@ export interface AtletaCustomer {
 export interface NewEquipeCustomer {
   nome: string
   ativo?: number
-  qtde_atletas: number
   setor: number
   criado_em?: string
+  id_campeonato?: number
   atualizado_em?: string
-  deletado_em?: string
 }
 
 export interface EquipeCustomer extends NewEquipeCustomer {
@@ -49,13 +48,13 @@ export interface EquipeCustomerComUltimaCaptura extends NewEquipeCustomer {
   qtde_atletas: number
   setor: number
   ultima_captura: string | null
+  total_peixes: number | null 
+  total_atletas: number | null
 }
 
 export interface NewPeixeCustomer {
-  tipo: string
-  tamanho: string
   peso: string
-  id_equipe: number
+  equipe_id: number
   criado_em: string
 }
 
@@ -68,4 +67,18 @@ export interface RankingCustomer{
   peso_total: number
   quantidade: number
   tamanho: number
+  pontos: number
+}
+
+
+export interface NewCampeonatoCustomer { 
+  nome: string
+  data_inicial: string
+  data_final: string
+  ativo?: number
+  criado_em: string
+}
+
+export interface CampeonatoCustomer extends NewCampeonatoCustomer {
+  id: number
 }

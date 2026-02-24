@@ -20,11 +20,25 @@ export function agoraParaSQLite(): string {
   const hora = String(agora.getHours()).padStart(2, '0')
   const minuto = String(agora.getMinutes()).padStart(2, '0')
 
-  return `${ano}-${mes}-${dia} ${hora}:${minuto}`
+  return `${ano}-${mes}-${dia}T${hora}:${minuto}`
 }
 
 export function capitalizeWords(str: string) {
-  return str
-    .toLowerCase()
-    .replace(/\b\w/g, char => char.toUpperCase())
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase())
 }
+
+export function tempoRelativo (data: string | null) {
+  if (!data) return "Nenhuma captura";
+
+  const diffMs = Date.now() - new Date(data).getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+
+  if (diffMin < 1) return "agora mesmo";
+  if (diffMin < 60) return `${diffMin} min atrás`;
+
+  const diffHoras = Math.floor(diffMin / 60);
+  if (diffHoras < 24) return `${diffHoras}h atrás`;
+
+  const diffDias = Math.floor(diffHoras / 24);
+  return `${diffDias} dias atrás`;
+};
