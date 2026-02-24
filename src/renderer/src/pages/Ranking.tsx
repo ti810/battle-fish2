@@ -5,6 +5,7 @@ import { cn } from '../lib/utils'
 import Loader from '../components/Loader'
 import { RankingCustomer } from '~/src/shared/types/interfaces'
 import { formataPeso } from '../lib/utils'
+import { maximum } from 'zod/v4-mini'
 
 export default function Ranking() {
   const [loading, setLoading] = useState(true)
@@ -157,7 +158,9 @@ export default function Ranking() {
           <motion.div className="flex flex-col items-center">
             <div className="mb-2 text-center">
               <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold mb-2 mx-auto">
-                {top3[1]?.equipe_nome?.charAt(0)}
+                {isRevealed
+                  ? top3[1]?.equipe_nome?.charAt(0)
+                  : '•••••'}
               </div>
 
               <p className="font-bold text-sm truncate w-24 mx-auto">
@@ -167,7 +170,7 @@ export default function Ranking() {
               </p>
 
               <p className="text-gray-500 text-xs">
-                {maskValue(top3[1]?.pontos)} pts
+                {maskValue(top3[1]?.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))} pts
               </p>
             </div>
 
@@ -185,7 +188,7 @@ export default function Ranking() {
                 <Trophy className="w-8 h-8 text-yellow-400 absolute -top-6 left-1/2 -translate-x-1/2" />
 
                 <div className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center text-2xl font-bold mb-2 mx-auto">
-                  {top3[0]?.equipe_nome?.charAt(0)}
+                  {isRevealed ? top3[0]?.equipe_nome?.charAt(0) : '•••••'}
                 </div>
               </div>
 
@@ -195,8 +198,8 @@ export default function Ranking() {
                   : '•••••'}
               </p>
 
-              <p className="text-blue-600 font-bold text-sm">
-                {maskValue(top3[0]?.pontos)} pts
+              <p className="text-blue-600 font-bold text-sm text-[12px]">
+                {maskValue(top3[0]?.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))} pts
               </p>
             </div>
 
@@ -220,9 +223,9 @@ export default function Ranking() {
                   : '•••••'}
               </p>
 
-              <p className="text-gray-500 text-xs">
-                {maskValue(top3[2]?.pontos)} pts
-              </p>
+              {/* <p className="text-gray-500 text-xs">
+                {maskValue(top3[2]?.pontos.toFixed(1))} pts
+              </p> */}
             </div>
 
             <div className="w-full h-24 bg-orange-200 rounded-t-lg flex items-end justify-center pb-4">
@@ -281,7 +284,7 @@ export default function Ranking() {
                 </div>
 
                 <div className="col-span-2 text-right font-bold text-blue-600">
-                  {maskValue(team.pontos)}
+                  {maskValue(team.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))}
                 </div>
               </motion.div>
             ))}
