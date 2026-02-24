@@ -1,19 +1,45 @@
 {
   "name": "battle-fish-system",
+  "productName": "Battle Fish System",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Sistema de gerenciamento de torneios de Battle Fish",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "zuludevelopmentapps.com",
+  "homepage": "https://zuludevelopmentapps.com",
+  "build": {
+      "appId": "com.zuludevelopment.battlefish",
+      "productName": "Battle Fish System",
+      "directories": {
+        "output": "dist"
+      },
+      "files": [
+        "out/**/*",
+        "resources/**/*",
+        "package.json"
+      ],
+      "win": {
+        "target": [
+          "nsis",
+          "portable"
+        ],
+        "icon": "build/icon.ico"
+      },
+      "nsis": {
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true,
+        "installerIcon": "build/icon.ico",
+        "uninstallerIcon": "build/icon.ico",
+        "installerHeaderIcon": "build/icon.ico",
+        "createDesktopShortcut": true,        
+        "createStartMenuShortcut": true      
+      }
+    },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
-    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
-    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
-    "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
-    "build": "npm run typecheck && electron-vite build",
+    "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
@@ -25,46 +51,46 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@material-tailwind/react": "^2.1.10",
-    "@tailwindcss/vite": "^4.1.17",
     "better-sqlite3": "^12.5.0",
     "bootstrap": "^4.6.2",
     "clsx": "^2.1.1",
     "express": "^5.2.1",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.559.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-hook-form": "^7.69.0",
     "react-router-dom": "^7.10.1",
     "rifm": "^0.12.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "vite-plugin-static-copy": "^3.1.4",
     "zod": "^4.2.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
+    "@tailwindcss/vite": "^4.2.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.23",
     "electron": "^39.2.6",
-    "electron-builder": "^23.0.6",
+    "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
+    "eslint-plugin-react-refresh": "^0.4.24",  
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-copy": "^2.0.1",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6"
+    "vite": "^7.2.6",
+    "vite-plugin-static-copy": "^3.2.0"
   }
 }

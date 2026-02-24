@@ -12,35 +12,33 @@ export class PeixeModel {
   private criarTabela(): void {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS peixes(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        tipo TEXT NOT NULL,
-        tamanho REAL,
-        peso REAL, 
-        id_equipe INTEGER NOT NULL,      
+        id INTEGER PRIMARY KEY AUTOINCREMENT,       
+        peso REAL NOT NULL, 
+        equipe_id INTEGER NOT NULL,      
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
         deletado_em TEXT,
-        FOREIGN KEY (id_equipe) REFERENCES equipes(id) ON DELETE CASCADE
+        FOREIGN KEY (equipe_id) REFERENCES equipes(id) ON DELETE CASCADE
       )
     `)
   }
 
   add(data: NewPeixeCustomer): number {
     const stmt = this.db.prepare(`
-      INSERT INTO peixes (tipo, tamanho, peso, id_equipe) 
-      VALUES (?, ?, ?, ?)
+      INSERT INTO peixes (peso, equipe_id) 
+      VALUES (?, ?)
     `)
 
-    const res = stmt.run(data.tipo, data.tamanho, data.peso, data.id_equipe)
+    const res = stmt.run(data.peso, data.equipe_id)
 
     return Number(res.lastInsertRowid)
   }
 
   listar(): PeixeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo, p.criado_em
+      SELECT p.id, p.peso, p.grupo_id, p.criado_em
       FROM peixes p
-      JOIN equipes g ON p.id_equipe = g.id
+      JOIN equipes e ON p.equipe_id = e.id
       WHERE p.deletado_em IS NULL       
       ORDER BY p.criado_em DESC
     `)
@@ -53,7 +51,7 @@ export class PeixeModel {
       SELECT p.id, p.tipo, p.tamanho, p.peso
       FROM peixes p    
       WHERE p.deletado_em IS NULL
-       AND id_equipe = ?
+       AND e = ?
       ORDER BY p.criado_em DESC
     `)
 
@@ -65,7 +63,7 @@ export class PeixeModel {
     const stmt = this.db.prepare(`
       SELECT p.id, p.tipo, p.tamanho, p.peso, g.nome as nome_grupo
       FROM peixes p
-      JOIN equipes g ON g.id = p.id_equipe
+      JOIN equipes g ON g.id = p.equipe_id
       WHERE p.id = ?
       ORDER by p.criado_em
     `)
@@ -77,26 +75,17 @@ export class PeixeModel {
 
   update(peixe: PeixeCustomer): boolean {
       const fields: string[] = []
-      const values: unknown[] = []
-  
-      if (peixe.tipo !== undefined) {
-        fields.push('tipo = ?')
-        values.push(peixe.tipo)
-      }
-  
-      if (peixe.tamanho !== undefined) {
-        fields.push('tamanho = ?')
-        values.push(peixe.tamanho)
-      }
+      const values: unknown[] = [] 
+    
 
       if (peixe.peso !== undefined) {
         fields.push('peso = ?')
         values.push(peixe.peso)
       }
 
-      if (peixe.id_equipe !== undefined) {
-        fields.push('id_equipe = ?')
-        values.push(peixe.id_equipe)
+      if (peixe.equipe_id !== undefined) {
+        fields.push('equipe_id = ?')
+        values.push(peixe.equipe_id)
       }
   
       if (fields.length === 0) {

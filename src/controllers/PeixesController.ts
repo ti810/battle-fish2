@@ -37,18 +37,6 @@ export class PeixesController {
       }
     })
 
-    ipcMain.handle('listarPeixeByEquipeId', (event, equipeId) => {
-      try {
-        return {
-          success: true,
-          data: this.model.listarByEquipeId(equipeId)
-        }
-      } catch (error) {
-        console.error('Erro ao buscar peixe', error)
-        throw error
-      }
-    })
-
     ipcMain.handle('listarPeixeById', (event, id) => {
       try {
         return this.model.buscarById(id)
@@ -59,16 +47,16 @@ export class PeixesController {
     })
 
     ipcMain.handle('editPeixeById', async (_, doc: PeixeCustomer) => {
-              try {
-                return {
-                  success: true,
-                  data: this.model.update(doc)
-                }
-              } catch (error) {
-                console.error('Erro ao atualizar peixe:', error)
-                throw error
-              }
-            })
+      try {
+        return {
+          success: true,
+          data: this.model.update(doc)
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar peixe:', error)
+        throw error
+      }
+    })
 
     ipcMain.handle('deletarPeixe', (event, id) => {
       try {

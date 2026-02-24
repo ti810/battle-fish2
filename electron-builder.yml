@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: battle-fish
+appId: com.zuludevelopmentapps.app
+productName: Battle Fish System
 directories:
   buildResources: build
 files:
@@ -31,13 +31,13 @@ dmg:
 linux:
   target:
     - AppImage
-    - snap
     - deb
-  maintainer: electronjs.org
+    - rpm
+    - freebsd
+    - pacman
+  maintainer: zuludevelopmentapps.com
+  synopsis: ${description}
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates

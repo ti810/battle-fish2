@@ -27,18 +27,40 @@ export function capitalizeWords(str: string) {
   return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-export function tempoRelativo (data: string | null) {
-  if (!data) return "Nenhuma captura";
+export function tempoRelativo(data: string | null) {
+  if (!data) return 'Nenhuma captura'
 
-  const diffMs = Date.now() - new Date(data).getTime();
-  const diffMin = Math.floor(diffMs / 60000);
+  const diffMs = Date.now() - new Date(data).getTime()
+  const diffMin = Math.floor(diffMs / 60000)
 
-  if (diffMin < 1) return "agora mesmo";
-  if (diffMin < 60) return `${diffMin} min atrás`;
+  if (diffMin < 1) return 'agora mesmo'
+  if (diffMin < 60) return `${diffMin} min atrás`
 
-  const diffHoras = Math.floor(diffMin / 60);
-  if (diffHoras < 24) return `${diffHoras}h atrás`;
+  const diffHoras = Math.floor(diffMin / 60)
+  if (diffHoras < 24) return `${diffHoras}h atrás`
 
-  const diffDias = Math.floor(diffHoras / 24);
-  return `${diffDias} dias atrás`;
-};
+  const diffDias = Math.floor(diffHoras / 24)
+  return `${diffDias} dias atrás`
+}
+
+export function formataPeso(peso: number): string {
+  const str = peso.toString()
+
+  const onlyNumbers = str.replace(/[^\d]/g, '').replace(/^0+(?=\d)/, '')
+
+  if (!onlyNumbers) return ''
+
+  const number = parseInt(onlyNumbers, 10)
+
+  // Se for menor que 1000 → gramas
+  if (number < 1000) {
+    return Number(number) === 1 ? '1 grama' : number + ' gramas'
+  }
+
+  // Se for 1000 ou mais → aplica sua máscara e adiciona "quilos"
+  const formatted = onlyNumbers
+    .replace(/(\d+)(\d{3})$/, '$1,$2')
+    .replace(/^(\d+),/, (match, p1) => p1.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',')
+
+  return Number(formatted.replace(',', '.')) === 1 ? formatted + ' quilo' : formatted + ' quilos'
+}

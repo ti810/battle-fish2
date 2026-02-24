@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import { RankingModel } from '../models/RankingModel'
 import DatabaseConstructor from 'better-sqlite3'
+import { success } from 'zod'
 
 export class RankingController {
   private model: RankingModel
@@ -15,7 +16,7 @@ export class RankingController {
     private registrarRotas() {
       ipcMain.handle('listarRanking', async () => {
         try {
-          return this.model.ranking()
+          return  this.model.ranking()        
         } catch (error) {
           console.error('Erro ao listar Ranking:', error)
           throw error

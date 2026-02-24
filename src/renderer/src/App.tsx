@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import Atletas from './pages/Atletas'
 import Layout from './components/Layout'
 import Custodia from './pages/Custodia'
@@ -24,7 +24,7 @@ export default function App(): React.JSX.Element {
   return (
     <>
       <Toaster richColors position='bottom-right' />
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Ranking />} />
@@ -35,7 +35,7 @@ export default function App(): React.JSX.Element {
             <Route path="/custodia" element={<Custodia />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </>
 
   )

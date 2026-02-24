@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 import Loader from '../components/Loader'
 import { RankingCustomer } from '~/src/shared/types/interfaces'
+import { formataPeso } from '../lib/utils'
+import { maximum } from 'zod/v4-mini'
 
 export default function Ranking() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] =
-    useState<'geral' | 'peso' | 'quantidade' | 'tamanho'>('geral')
+    useState<'geral' | 'quantidade'>('geral')
 
   const [teams, setTeams] = useState<RankingCustomer[]>([])
   const [isRevealed, setIsRevealed] = useState(false)
@@ -44,7 +46,7 @@ export default function Ranking() {
     async function loadRanking() {
       try {
         setLoading(true)
-        const data = await window.api.listarRanking()
+        const data = await window.api.listarRanking()   
         setTeams(data)
       } catch (err) {
         console.error('Erro ao carregar ranking', err)
@@ -63,19 +65,9 @@ export default function Ranking() {
   // ✅ SORT CORRETO
   const getSortedTeams = () => {
     switch (activeTab) {
-      case 'peso':
-        return [...teams].sort(
-          (a, b) => b.peso_total - a.peso_total
-        )
-
       case 'quantidade':
         return [...teams].sort(
           (a, b) => b.quantidade - a.quantidade
-        )
-
-      case 'tamanho':
-        return [...teams].sort(
-          (a, b) => b.tamanho - a.tamanho
         )
 
       default:
@@ -138,9 +130,9 @@ export default function Ranking() {
         <div className="flex flex-wrap gap-2 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit">
           {[
             { id: 'geral', label: 'Geral', icon: Trophy },
-            { id: 'peso', label: 'Maior Peso', icon: Scale },
-            { id: 'quantidade', label: 'Quantidade', icon: Hash },
-            { id: 'tamanho', label: 'Maior Peixe', icon: Ruler }
+            { id: 'quantidade', label: 'Maior Quantidade', icon: Hash },
+            // { id: 'quantidade', label: 'Quantidade', icon: Hash },
+            // { id: 'tamanho', label: 'Maior Peixe', icon: Ruler }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -166,7 +158,9 @@ export default function Ranking() {
           <motion.div className="flex flex-col items-center">
             <div className="mb-2 text-center">
               <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold mb-2 mx-auto">
-                {top3[1]?.equipe_nome?.charAt(0)}
+                {isRevealed
+                  ? top3[1]?.equipe_nome?.charAt(0)
+                  : '•••••'}
               </div>
 
               <p className="font-bold text-sm truncate w-24 mx-auto">
@@ -176,7 +170,7 @@ export default function Ranking() {
               </p>
 
               <p className="text-gray-500 text-xs">
-                {maskValue(top3[1]?.pontos)} pts
+                {maskValue(top3[1]?.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))} pts
               </p>
             </div>
 
@@ -194,7 +188,7 @@ export default function Ranking() {
                 <Trophy className="w-8 h-8 text-yellow-400 absolute -top-6 left-1/2 -translate-x-1/2" />
 
                 <div className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center text-2xl font-bold mb-2 mx-auto">
-                  {top3[0]?.equipe_nome?.charAt(0)}
+                  {isRevealed ? top3[0]?.equipe_nome?.charAt(0) : '•••••'}
                 </div>
               </div>
 
@@ -204,8 +198,8 @@ export default function Ranking() {
                   : '•••••'}
               </p>
 
-              <p className="text-blue-600 font-bold text-sm">
-                {maskValue(top3[0]?.pontos)} pts
+              <p className="text-blue-600 font-bold text-sm text-[12px]">
+                {maskValue(top3[0]?.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))} pts
               </p>
             </div>
 
@@ -229,9 +223,9 @@ export default function Ranking() {
                   : '•••••'}
               </p>
 
-              <p className="text-gray-500 text-xs">
-                {maskValue(top3[2]?.pontos)} pts
-              </p>
+              {/* <p className="text-gray-500 text-xs">
+                {maskValue(top3[2]?.pontos.toFixed(1))} pts
+              </p> */}
             </div>
 
             <div className="w-full h-24 bg-orange-200 rounded-t-lg flex items-end justify-center pb-4">
@@ -251,7 +245,7 @@ export default function Ranking() {
               Peso Total
             </div>
             <div className="col-span-2 text-right hidden md:block">
-              Qtd
+              Qtd de peixes
             </div>
             <div className="col-span-2 text-right">
               Pontos
@@ -261,7 +255,7 @@ export default function Ranking() {
           <div className="divide-y">
             {sortedTeams.map((team, index) => (
               <motion.div
-                key={team.id}
+                key={index}
                 className="grid grid-cols-12 gap-4 p-4 items-center"
               >
                 <div className="col-span-1 text-center">
@@ -275,14 +269,14 @@ export default function Ranking() {
                       : '•••••'}
                   </p>
 
-                  <p className="text-xs text-gray-400 md:hidden">
+                  {/* <p className="text-xs text-gray-400 md:hidden">
                     {maskValue(team.peso_total.toFixed(1))}kg •{' '}
                     {maskValue(team.quantidade)} peixes
-                  </p>
+                  </p> */}
                 </div>
 
                 <div className="col-span-2 text-right hidden md:block">
-                  {maskValue(team.peso_total.toFixed(1))}kg
+                  {maskValue(formataPeso(team.peso_total))}
                 </div>
 
                 <div className="col-span-2 text-right hidden md:block">
@@ -290,7 +284,7 @@ export default function Ranking() {
                 </div>
 
                 <div className="col-span-2 text-right font-bold text-blue-600">
-                  {maskValue(team.pontos)}
+                  {maskValue(team.pontos.toLocaleString('pt-BR',{minimumFractionDigits: 2, maximumFractionDigits: 2}))}
                 </div>
               </motion.div>
             ))}

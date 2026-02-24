@@ -1,16 +1,17 @@
-import { resolve } from 'path'
-import { defineConfig } from 'electron-vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { resolve } from "path";
+import { defineConfig } from "electron-vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { viteStaticCopy } from "vite-plugin-static-copy";
+
 export default defineConfig({
   main: {
     plugins: [
       viteStaticCopy({
         targets: [
           {
-            src: 'resources/*',
-            dest: 'resources'
+            src: "resources/*",
+            dest: "resources"
           }
         ]
       })
@@ -20,9 +21,12 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        "@renderer": resolve(__dirname, "src/renderer/src")
       }
     },
-    plugins: [react(), tailwindcss()]
+    plugins: [
+      react(),
+      tailwindcss()
+    ]
   }
-})
+});

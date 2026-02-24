@@ -14,6 +14,7 @@ export function createTray(window: BrowserWindow) {
       label: 'Abrir',
       click: () => {
         window.show()
+        window.maximize()
       }
     },
     { type: 'separator' }
