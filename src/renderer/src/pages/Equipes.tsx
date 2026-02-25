@@ -390,10 +390,6 @@ export default function Equipes() {
   }, [equipeId]);
 
 
-  useEffect(() => {
-    console.log(equipeSelecionada, isEquipeSelecionada)
-  }, [equipeSelecionada, isEquipeSelecionada])
-
   return (
     <>
       <Loader show={loading} />

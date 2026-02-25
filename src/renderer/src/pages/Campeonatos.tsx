@@ -207,7 +207,7 @@ export default function Campeonatos() {
       res.data.map(async (campeonato: { id: number }) => window.api.listarEquipesByCampeonatoId(campeonato.id))
     )
 
-    setEquipesCount((equipes[0].data.totalEquipes))
+    setEquipesCount((equipes[0].data.totalEquipes) || null)
   };
 
   // const handleDeletarEquipe = async () => {
