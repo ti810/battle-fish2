@@ -82,3 +82,11 @@ export interface NewCampeonatoCustomer {
 export interface CampeonatoCustomer extends NewCampeonatoCustomer {
   id: number
 }
+
+export interface CustodiaCustomer{
+  id:number
+  peso: number
+  equipe: string
+  campeonato: string
+  setor:number
+}
