@@ -55,7 +55,7 @@ export interface EquipeCustomerComUltimaCaptura extends NewEquipeCustomer {
 export interface NewPeixeCustomer {
   peso: string
   equipe_id: number
-  criado_em: string
+  criado_em?: string
 }
 
 export interface PeixeCustomer extends NewPeixeCustomer {
@@ -85,8 +85,9 @@ export interface CampeonatoCustomer extends NewCampeonatoCustomer {
 
 export interface CustodiaCustomer{
   id:number
-  peso: number
+  peso: string
   equipe: string
+  id_equipe: number
   campeonato: string
   setor:number
 }

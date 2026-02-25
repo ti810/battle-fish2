@@ -14,6 +14,7 @@ export class CustodiaModel {
     p.id   AS id,
     p.peso  AS peso,
     e.nome AS equipe,
+    e.id AS id_equipe,
     e.setor AS setor,
     c.nome AS campeonato
     FROM peixes p
