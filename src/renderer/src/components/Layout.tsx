@@ -1,10 +1,10 @@
 import React from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Trophy, Users, UserCircle, AlignCenterVertical, Fish, Menu, X, Anchor } from 'lucide-react'
+import { Trophy, Users, UserCircle,ClipboardList, AlignCenterVertical, Fish, Menu, X, Anchor } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 
-import logo from '../assets/images/logo.png'
+import logo from '../assets/images/novo_icone_battle_fish.png'
 
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
@@ -12,7 +12,8 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
     { to: '/campeonatos', icon: AlignCenterVertical, label: 'Campeonatos' },
     { to: '/equipes', icon: Fish, label: 'Equipes' },
     { to: '/atletas', icon: Users, label: 'Atletas' },
-    { to: '/usuarios', icon: UserCircle, label: 'Usuários' }
+    { to: '/usuarios', icon: UserCircle, label: 'Usuários' },
+    {to: '/custodia', icon: ClipboardList, label:'Custódia'}
   ]
 
   return (

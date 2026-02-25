@@ -13,6 +13,7 @@ import { AtletasController } from "../controllers/AtletasController";
 import { PeixesController } from "../controllers/PeixesController";
 import { RankingController } from "../controllers/RankingController";
 import { CampeonatosController } from "../controllers/CampeonatosController";
+import { CustodiaController } from "../controllers/CustodiaController";
 import { fa } from "zod/locales";
 
 let mainWindow: BrowserWindow | null = null;
@@ -95,6 +96,7 @@ app.whenReady().then(() => {
   new AtletasController(db);
   new PeixesController(db);
   new RankingController(db);
+  new CustodiaController(db);
 
   electronApp.setAppUserModelId("com.electron");
 

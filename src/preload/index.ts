@@ -10,7 +10,8 @@ import {
   AtletaCustomer,
   PeixeCustomer,
   CampeonatoCustomer,
-  NewCampeonatoCustomer
+  NewCampeonatoCustomer,
+  CustodiaCustomer
 } from '../shared/types/interfaces'
 
 declare global {
@@ -58,6 +59,8 @@ const api = {
   deletarCampeonato: (id: number) => ipcRenderer.invoke('deletarCampeonato', id),
   listarCampeonatos: () => ipcRenderer.invoke('listarCampeonatos'),
   listarEquipesByCampeonatoId: (id: number) => ipcRenderer.invoke('listarEquipesByCampeonatoId', id),
+  //custodia
+  listarCustodia: () => ipcRenderer.invoke('listarCustodia'),
 
   // Message Box 
   showMessageBox: (options: Electron.MessageBoxOptions) => ipcRenderer.invoke('show-message-box', options)
