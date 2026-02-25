@@ -455,7 +455,7 @@ export default function Campeonatos() {
                 <div
                   className="text-gray-600 flex items-center gap-1"
                 >
-                  <span className='flex font-semibold from-green-600 to-gray-600 bg-linear-to-l w-7 h-7 rounded-full justify-center items-center text-white text-lg'>{Number(equipesCount)}</span> Equipe{Number(equipesCount) > 1 && "s"} participando no momento
+                  <span className='flex font-semibold from-green-600 to-gray-600 bg-linear-to-l w-7 h-7 rounded-full justify-center items-center text-white text-lg'>{Number(equipesCount) || 0}</span> Equipe{Number(equipesCount) > 1 && "s"} participando no momento
                 </div>
                 <button
                   onClick={() => navigate("/equipes?", { state: { openModal: true } })}

@@ -56,7 +56,7 @@ export default function Equipes() {
 
   // Form states
   const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
-    nome: "",  
+    nome: "",
     criado_em: agoraParaSQLite(),
   });
 
@@ -73,7 +73,7 @@ export default function Equipes() {
   });
 
   const initialEquipeForm = {
-    nome: "",   
+    nome: "",
     criado_em: "",
   }
 
@@ -114,7 +114,7 @@ export default function Equipes() {
         return
       }
 
-      const res = await window.api.editEquipeById(equipeForm as EquipeCustomer)    
+      const res = await window.api.editEquipeById(equipeForm as EquipeCustomer)
 
       if (res.data.success) {
         toast.success("Equipe alterada com sucesso")
@@ -123,8 +123,8 @@ export default function Equipes() {
         setShowEditEquipeModal(false)
         carregarDados()
 
-      }else{
-         toast.error(res.data.message)
+      } else {
+        toast.error(res.data.message)
       }
 
     } catch (error) {
@@ -390,6 +390,9 @@ export default function Equipes() {
   }, [equipeId]);
 
 
+  useEffect(() => {
+    console.log(equipeSelecionada, isEquipeSelecionada)
+  }, [equipeSelecionada, isEquipeSelecionada])
 
   return (
     <>
@@ -427,7 +430,7 @@ export default function Equipes() {
               <button
                 onClick={() => {
                   setShowAddEquipeModal(true)
-                  setEquipeForm({nome: ""})
+                  setEquipeForm({ nome: "" })
                 }}
                 className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
               >

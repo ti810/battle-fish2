@@ -97,3 +97,9 @@
     transform: translateY(0);
   } 
 }
+
+.disabled {
+  opacity: 0.1 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}

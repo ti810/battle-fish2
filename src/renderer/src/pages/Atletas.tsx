@@ -1,17 +1,24 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { UserPlus, Search, Edit2, Trash2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AtletaCustomer, NewAtletaCustomer, EquipeCustomer } from '~/src/shared/types/interfaces'
 import { agoraParaSQLite } from '../lib/utils'
 import { toast } from 'sonner'
+import { atletaSchema, formValidation } from '../hooks/formValidation'
 
 
 
 
 export default function Atletas() {
+
+
+  const idEquipeRef = useRef<HTMLInputElement>(null)
+  const nomeRef = useRef<HTMLInputElement>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+
   const [equipes, setEquipes] = useState<EquipeCustomer[]>([])
   const [atletas, setAtletas] = useState<AtletaCustomer[]>([])
-  const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomer | undefined>(undefined)
+  const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomer | null>(null)
   const [isEquipeSelecionada, setIsEquipeSelecionada] = useState(false);
 
   const [showModal, setShowModal] = useState(false)
@@ -22,7 +29,7 @@ export default function Atletas() {
     nome: '',
     equipe_id: 0
   })
- 
+
 
   useEffect(() => {
     loadAtletas()
@@ -80,7 +87,29 @@ export default function Atletas() {
 
 
   const handleSaveMember = async () => {
-    if (!atletaForm.nome || !atletaForm.equipe_id) return
+
+    const validationRules = await formValidation(atletaSchema, atletaForm)
+
+    if (!(validationRules).success) {
+      setFieldErrors(validationRules.fieldErrors)
+      const firstField = Object.keys(validationRules.fieldErrors)[0]
+      if (firstField === "nome") {
+        nomeRef.current?.focus()
+      }
+
+      if (firstField === "id_equipe") {
+        idEquipeRef.current?.focus()
+      }
+      toast.error(
+        <div className="space-y-1">
+          {Object.values(validationRules.fieldErrors).map((err, index) => (
+            <p key={index}>• {err}</p>
+          ))}
+        </div>
+      )
+
+      return
+    }
 
     if (editingMember) {
       await window.api.editAtletaById({
@@ -119,7 +148,7 @@ export default function Atletas() {
   }
 
   const filteredMembers = atletas.filter(
-    (m) =>    
+    (m) =>
       m.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.equipe_nome?.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -129,6 +158,10 @@ export default function Atletas() {
     return (equipes ?? []).find((e) => e.id === atletaForm.equipe_id)?.setor ?? ''
   }, [atletaForm.equipe_id, equipes])
 
+
+  useEffect(() => {
+    console.log(equipeSelecionada, isEquipeSelecionada)
+  }, [equipeSelecionada, isEquipeSelecionada])
 
   return (
     <div className="space-y-6">
@@ -141,8 +174,9 @@ export default function Atletas() {
         <button
           onClick={() => {
             handleOpenModal()
-            setEquipeSelecionada(equipes.find(e => e.id === atletaForm.equipe_id))
+            // setEquipeSelecionada(null)
             setIsEquipeSelecionada(false)
+            setAtletaForm(prev => ({ ...prev, equipe_id: 0 }))
           }}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
         >
@@ -212,6 +246,7 @@ export default function Atletas() {
                       <button
                         onClick={() => {
                           handleOpenModal(atleta)
+                          setEquipeSelecionada((equipes).find(e => e.id === atleta.equipe_id) || null)
                           setIsEquipeSelecionada(true)
                         }}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
@@ -268,6 +303,7 @@ export default function Atletas() {
                   </label>
 
                   <input
+                    ref={nomeRef}
                     type="text"
                     value={atletaForm.nome}
                     onChange={(e) =>
@@ -286,7 +322,7 @@ export default function Atletas() {
                   </label>
 
                   <select
-                    value={atletaForm.equipe_id}
+                    value={atletaForm.equipe_id || ""}
                     onChange={(e) =>
                       setAtletaForm({
                         ...atletaForm,
@@ -295,10 +331,10 @@ export default function Atletas() {
                     }
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                   >
-                    <option disabled value={0}>Selecione uma equipe...</option>
-                    {isEquipeSelecionada ? (
+                    <option disabled value="">Selecione uma equipe...</option>
+                    {equipeSelecionada && isEquipeSelecionada ? (
                       <option value={atletaForm.equipe_id}>
-                       {equipes.find(equipe => equipe.id === atletaForm.equipe_id)?.nome}
+                        {equipes.find(equipe => equipe.id === atletaForm.equipe_id)?.nome}
                       </option>
                     ) : equipes.map((equipe) => (
                       <option key={equipe.id} value={equipe.id}>

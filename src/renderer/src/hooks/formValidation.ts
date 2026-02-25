@@ -59,7 +59,7 @@ export const atletaSchema = z.object({
     .trim()
     .min(4, "Nome do atleta muito curto: Mínimo 4 caracteres")
     .max(50, "Nome do atleta muito grande: Máximo 50 caracteres"),
-  equipe_id: z.number().min(1),
+  equipe_id: z.number().min(1, "Selecione uma Equipe"),
 });
 
 export const campeonatoSchema = z.object({
