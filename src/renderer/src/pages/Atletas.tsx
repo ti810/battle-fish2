@@ -1,23 +1,34 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { UserPlus, Search, Edit2, Trash2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AtletaCustomer, NewAtletaCustomer, EquipeCustomer } from '~/src/shared/types/interfaces'
 import { agoraParaSQLite } from '../lib/utils'
+import { toast } from 'sonner'
+import { atletaSchema, formValidation } from '../hooks/formValidation'
+
 
 
 
 export default function Atletas() {
-const [equipes, setEquipes] = useState<EquipeCustomer[]>([])
-const [atletas, setAtletas] = useState<AtletaCustomer[]>([])
 
-const [showModal, setShowModal] = useState(false)
-const [editingMember, setEditingMember] = useState<AtletaCustomer | null>(null)
-const [searchTerm, setSearchTerm] = useState('')
 
-const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
-  nome: '',
-  equipe_id: 0
-})
+  const idEquipeRef = useRef<HTMLInputElement>(null)
+  const nomeRef = useRef<HTMLInputElement>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+
+  const [equipes, setEquipes] = useState<EquipeCustomer[]>([])
+  const [atletas, setAtletas] = useState<AtletaCustomer[]>([])
+  const [equipeSelecionada, setEquipeSelecionada] = useState<EquipeCustomer | null>(null)
+  const [isEquipeSelecionada, setIsEquipeSelecionada] = useState(false);
+
+  const [showModal, setShowModal] = useState(false)
+  const [editingMember, setEditingMember] = useState<AtletaCustomer | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
+    nome: '',
+    equipe_id: 0
+  })
 
 
   useEffect(() => {
@@ -26,78 +37,112 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
   }, [])
 
   async function loadAtletas() {
-  const res = await window.api.atletaComSetor()
+    const res = await window.api.atletaComSetor()
 
-  if (!res?.success) return
+    if (!res?.success) return
 
-  setAtletas(res.data)
-}
+    setAtletas(res.data)
+  }
 
 
 
   async function loadEquipes() {
-  const res = await window.api.listarEquipes()
+    const res = await window.api.listarEquipes()
 
-  if (!res?.success) {
-    setEquipes([])
-    return
+    if (!res?.success) {
+      setEquipes([])
+
+      return
+    }
+
+    setEquipes(res.data)
   }
-
-  setEquipes(res.data)
-}
 
 
   const handleOpenModal = (atleta?: AtletaCustomer) => {
-  if (atleta) {
-    setEditingMember(atleta)
+    if (atleta) {
+      setEditingMember(atleta)
 
-    setAtletaForm({
-      nome: atleta.nome,
-      equipe_id: atleta.equipe_id
-    })
-  } else {
-    setEditingMember(null)
+      setAtletaForm({
+        nome: atleta.nome,
+        equipe_id: atleta.equipe_id
+      })
+    } else {
+      setEditingMember(null)
 
-    setAtletaForm({
-      nome: '',
-      equipe_id: equipes[0]?.id ?? 0
-    })
+      setAtletaForm({
+        nome: '',
+        equipe_id: equipes[0]?.id ?? 0
+      })
+    }
+
+    setShowModal(true)
   }
-
-  setShowModal(true)
-}
 
 
   const handleCloseModal = () => {
-  setShowModal(false)
-  setEditingMember(null)
-}
+    setShowModal(false)
+    setEditingMember(null)
+  }
 
 
   const handleSaveMember = async () => {
-  if (!atletaForm.nome || !atletaForm.equipe_id) return
 
-  if (editingMember) {
-    await window.api.editAtletaById({
-      id: editingMember.id,
-      nome: atletaForm.nome,
-      equipe_id: atletaForm.equipe_id
-    })
-  } else {
-    await window.api.addNovoAtleta({
-      nome: atletaForm.nome,
-      equipe_id: atletaForm.equipe_id
-    })
+    const validationRules = await formValidation(atletaSchema, atletaForm)
+
+    if (!(validationRules).success) {
+      setFieldErrors(validationRules.fieldErrors)
+      const firstField = Object.keys(validationRules.fieldErrors)[0]
+      if (firstField === "nome") {
+        nomeRef.current?.focus()
+      }
+
+      if (firstField === "id_equipe") {
+        idEquipeRef.current?.focus()
+      }
+      toast.error(
+        <div className="space-y-1">
+          {Object.values(validationRules.fieldErrors).map((err, index) => (
+            <p key={index}>• {err}</p>
+          ))}
+        </div>
+      )
+
+      return
+    }
+
+    if (editingMember) {
+      await window.api.editAtletaById({
+        id: editingMember.id,
+        nome: atletaForm.nome,
+        equipe_id: atletaForm.equipe_id
+      })
+    } else {
+      await window.api.addNovoAtleta({
+        nome: atletaForm.nome,
+        equipe_id: atletaForm.equipe_id
+      })
+    }
+
+    await loadAtletas()
+    handleCloseModal()
   }
-
-  await loadAtletas()
-  handleCloseModal()
-}
 
 
   const handleDeleteMember = async (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este atleta?')) {
+
+    const resposta = await window.api.showMessageBox({
+      type: 'question',
+      buttons: ['Sim', 'Não'],
+      defaultId: 1,
+      cancelId: 1,
+      title: 'Deseja Exluir?',
+      message: `Tem certeza que deseja excluir este atleta? " *** ${atletas.find(a => a.id === id)?.nome.toUpperCase()} ***`,
+    })
+
+    if (resposta.response === 0) {
       await window.api.deletarAtleta(id)
+      toast.success(`Atleta ${atletaForm.nome} excluído com sucesso!`)
       await loadAtletas()
     }
   }
@@ -110,8 +155,8 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
 
   // setor calculado a partir da equipe selecionada
   const setorSelecionado = useMemo(() => {
-  return (equipes ?? []).find((e) => e.id === atletaForm.equipe_id)?.setor ?? ''
-}, [atletaForm.equipe_id, equipes])
+    return (equipes ?? []).find((e) => e.id === atletaForm.equipe_id)?.setor ?? ''
+  }, [atletaForm.equipe_id, equipes])
 
 
   return (
@@ -123,7 +168,12 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
         </div>
 
         <button
-          onClick={() => handleOpenModal()}
+          onClick={() => {
+            handleOpenModal()
+            // setEquipeSelecionada(null)
+            setIsEquipeSelecionada(false)
+            setAtletaForm(prev => ({ ...prev, equipe_id: 0 }))
+          }}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
         >
           <UserPlus className="w-4 h-4" />
@@ -157,7 +207,7 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredMembers.map((atleta:any, idx:any) => (
+              {filteredMembers.map((atleta: any, idx: any) => (
                 <motion.tr
                   key={atleta.id}
                   initial={{ opacity: 0, x: -10 }}
@@ -190,7 +240,11 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => handleOpenModal(atleta)}
+                        onClick={() => {
+                          handleOpenModal(atleta)
+                          setEquipeSelecionada((equipes).find(e => e.id === atleta.equipe_id) || null)
+                          setIsEquipeSelecionada(true)
+                        }}
                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -245,6 +299,7 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
                   </label>
 
                   <input
+                    ref={nomeRef}
                     type="text"
                     value={atletaForm.nome}
                     onChange={(e) =>
@@ -263,7 +318,7 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
                   </label>
 
                   <select
-                    value={atletaForm.equipe_id}
+                    value={atletaForm.equipe_id || ""}
                     onChange={(e) =>
                       setAtletaForm({
                         ...atletaForm,
@@ -272,11 +327,17 @@ const [atletaForm, setAtletaForm] = useState<NewAtletaCustomer>({
                     }
                     className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                   >
-                    {equipes.map((equipe) => (
+                    <option disabled value="">Selecione uma equipe...</option>
+                    {equipeSelecionada && isEquipeSelecionada ? (
+                      <option value={atletaForm.equipe_id}>
+                        {equipes.find(equipe => equipe.id === atletaForm.equipe_id)?.nome}
+                      </option>
+                    ) : equipes.map((equipe) => (
                       <option key={equipe.id} value={equipe.id}>
                         {equipe.nome}
                       </option>
                     ))}
+
                   </select>
                 </div>
 

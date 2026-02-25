@@ -2,7 +2,7 @@ import { Menu, Tray, nativeImage, BrowserWindow, app } from 'electron'
 import path from 'node:path'
 
 export function createTray(window: BrowserWindow) {
-  const appIcon = path.join(__dirname, 'resources', 'icon.png')
+  const appIcon = path.join(__dirname, 'resources', 'icon.ico')
   const icon = nativeImage.createFromPath(appIcon)
 
   const tray = new Tray(icon)

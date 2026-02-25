@@ -15,7 +15,10 @@ import { RankingController } from "../controllers/RankingController";
 import { CampeonatosController } from "../controllers/CampeonatosController";
 import { CustodiaController } from "../controllers/CustodiaController";
 import { fa } from "zod/locales";
+<<<<<<< HEAD
 import Custodia from "../renderer/src/pages/Custodia";
+=======
+>>>>>>> main
 
 let mainWindow: BrowserWindow | null = null;
 
