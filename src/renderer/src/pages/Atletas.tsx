@@ -246,7 +246,7 @@ export default function Atletas() {
                     {atleta.equipe_nome}
                   </td>
 
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 ">
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700">
                       {atleta.equipe_setor}
                     </span>
