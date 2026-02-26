@@ -17,72 +17,75 @@ const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
   ]
 
   return (
-    <>
-      {/* Mobile Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            exit={{ opacity: 0 }}
+  <>
+    {/* Mobile Overlay */}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 bg-black z-40 md:hidden"
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Sidebar */}
+    <motion.div
+      className={cn(
+        // ⬇️ COR ALTERADA AQUI
+        'fixed h-full md:h-auto top-0 left-0 w-64 bg-blue-900 shadow-black/20 z-50 transform md:translate-x-0 md:static md:shadow-lg',
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      )}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      {/* Header */}
+      <div className="h-16 flex items-center justify-center border-b border-blue-800 bg-blue-900">
+        <div className="flex items-center gap-2 text-blue-50 font-bold text-xl">
+          <Anchor className="w-6 h-6" />
+          <span>BattleFish</span>
+        </div>
+      </div>
+
+      <nav className="p-4 space-y-2">
+        {links.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black z-40 md:hidden"
-          />
-        )}
-      </AnimatePresence>
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                isActive
+                  // ⬇️ item ativo
+                  ? 'bg-blue-700/40 text-white shadow-sm font-medium translate-x-1'
+                  // ⬇️ item normal / hover
+                  : 'text-blue-100 hover:bg-blue-800/60 hover:text-white'
+              )
+            }
+          >
+            <link.icon className="w-5 h-5" />
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
 
-      {/* Sidebar */}
-      <motion.div
-        className={cn(
-          'fixed h-full md:h-auto top-0 left-0 w-64 bg-linear-to-bl from-blue-50 to-blue-100 shadow-gray-400 z-50 transform md:translate-x-0 md:static md:shadow-lg',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
-        <div className="h-16 flex items-center justify-center border-b border-gray-100 bg-blue-600">
-          <div className="flex items-center gap-2 text-white font-bold text-xl">
-            {/* <img className="w-12.5 h-12.5 object-contain rounded-2xl" src={logo} /> */}
-            <Anchor className="w-6 h-6" />
-            <span>BattleFish</span>
+      {/* Footer */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-800">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white font-bold shadow-md">
+            A
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-blue-50 truncate">Admin</p>
+            <p className="text-xs text-blue-200 truncate">Organizador</p>
           </div>
         </div>
-
-        <nav className="p-4 space-y-2">
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setIsOpen(false)}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                  isActive
-                    ? 'bg-blue-50 text-blue-600 shadow-sm font-medium translate-x-1'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                )
-              }
-            >
-              <link.icon className="w-5 h-5" />
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 shadow-top">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-md">
-              A
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900 truncate">Admin</p>
-              <p className="text-xs text-gray-500 truncate">Organizador</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </>
-  )
-}
+      </div>
+    </motion.div>
+  </>
+)}
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
@@ -95,13 +98,13 @@ export default function Layout() {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Mobile Header */}
         <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 md:hidden z-30">
-          <div className="flex items-center gap-2 font-bold text-blue-600">
+          <div className="flex items-center gap-2 font-bold text-blue-700">
             <Anchor className="w-6 h-6" />
             <span>BattleFishSystem</span>
           </div>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 text-gray-600"
+            className="p-2 rounded-md hover:bg-slate-100 text-slate-600"
           >
             {isSidebarOpen ? <X /> : <Menu />}
           </button>
