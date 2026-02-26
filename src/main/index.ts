@@ -35,11 +35,11 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
-      // devTools: false
+      devTools: false
     },
   });
 
-  mainWindow.webContents.openDevTools({ mode: "right" }); // Abrir com DevTools aberto
+  // mainWindow.webContents.openDevTools({ mode: "right" }); // Abrir com DevTools aberto
 
   mainWindow.setMenu(null);
 
@@ -78,16 +78,16 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  // const userDataPath = app.getPath("userData");
-  // const dbPath = path.join(userDataPath, "app.db");
-  // const db = new Database(dbPath);
+  const userDataPath = app.getPath("userData");
+  const dbPath = path.join(userDataPath, "app.db");
+  const db = new Database(dbPath);
 
-  // if (!fs.existsSync(dbPath)) {
-  //   const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
-  //   fs.copyFileSync(sourceDbPath, dbPath);
-  // }
+  if (!fs.existsSync(dbPath)) {
+    const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
+    fs.copyFileSync(sourceDbPath, dbPath);
+  }
 
-  const db = new Database("./src/database/app.db"); //DB modo DEV
+  // const db = new Database("./src/database/app.db"); //DB modo DEV
 
   new UsuariosController(db);
   new CampeonatosController(db);

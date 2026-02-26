@@ -28,9 +28,7 @@ export const equipeSchema = z.object({
     .trim()
     .min(4, "Nome da Equipe está muito curtao(Minimo 4 caracteres)")
     .max(50, "Nome da Equipe é muito longo"),
-  setor: z
-    .number()
-    .optional()
+  setor: z.number().optional(),
 });
 
 export const peixeSchema = z.object({
@@ -62,33 +60,63 @@ export const atletaSchema = z.object({
   equipe_id: z.number().min(1, "Selecione uma Equipe"),
 });
 
-export const campeonatoSchema = z.object({
-  nome: z
-    .string()
-    .trim()
-    .min(1, "Nome do campeonato é obrigatório")
-    .refine(
-      (val) => {
-        if (val != "" && val.length < 4) return false;
-        return true;
-      },
-      { message: "Nome do campeonato muito curto: Mínimo 4 caracteres" }
-    )
-    .max(50, "Nome do campeonato muito grande: Máximo 50 caracteres"),
-  data_inicial: z.string().min(1, "Data inicial é obrigatória"),
-  // .refine((val) => !isNaN(Date.parse(val)), {
-  //   message: 'Data inicial inválida'
-  // }),
+// export const campeonatoSchema = z.object({
+//   nome: z
+//     .string()
+//     .trim()
+//     .min(1, "Nome do campeonato é obrigatório")
+//     .refine(
+//       (val) => {
+//         if (val != "" && val.length < 4) return false;
+//         return true;
+//       },
+//       { message: "Nome do campeonato muito curto: Mínimo 4 caracteres" }
+//     )
+//     .max(50, "Nome do campeonato muito grande: Máximo 50 caracteres"),
+//   data_inicial: z.string().min(1, "Data inicial é obrigatório"),
+//   data_final: z.string().min(1, "Data final é obrigatório"),
+// });
 
-  data_final: z.string().min(1, "Data final é obrigatória"),
-  // .refine((val) => !isNaN(Date.parse(val)), {
-  //   message: 'Data final inválida'
-  // }),
-  // ativo: z
-  //   .number()
-  //   .min(1, 'Marque Ativo ou Inativo')
-  //   .transform((val) => Number(val))
-  //   .refine((val) => val === 0 || val === 1, {
-  //     message: 'Marque Ativo ou Inativo'
-  //   })
-});
+export const campeonatoSchema = z
+  .object({
+    nome: z
+      .string()
+      .trim()
+      .min(1, "Nome do campeonato é obrigatório")
+      .refine(
+        (val) => {
+          if (val != "" && val.length < 4) return false;
+          return true;
+        },
+        { message: "Nome do campeonato muito curto: Mínimo 4 caracteres" }
+      )
+      .max(50, "Nome do campeonato muito grande: Máximo 50 caracteres"),
+
+    data_inicial: z.coerce.string().min(1, "Data Inicial é obrigatória"),
+
+    data_final: z.coerce.string().min(1, "Data Final é obrigatória"),
+  })
+  .superRefine((values, ctx) => {
+    const agora = new Date();
+    agora.setSeconds(0);
+    agora.setMilliseconds(0);
+
+    const inicial = new Date(values.data_inicial);
+    const final = new Date(values.data_final);
+
+    if (inicial < agora) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A data inicial não pode ser menor que a atual",
+        path: ["data_inicial"],
+      });
+    }
+
+    if (final < inicial) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A data final não pode ser menor que a data inicial",
+        path: ["data_final"],
+      });
+    }
+  });

@@ -12,6 +12,12 @@
       "directories": {
         "output": "dist"
       },
+      "extraResources": [
+        {
+          "from": "resources/icon.ico",
+          "to": "icon.ico"
+        }
+      ],
       "files": [
         "out/**/*",
         "resources/**/*",

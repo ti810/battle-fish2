@@ -112,6 +112,8 @@ export default function Campeonatos() {
 
       const validationRules = await formValidation(campeonatoSchema, campeonatoForm)
 
+      // console.log(validationRules)
+
       if (!validationRules.success) {
         setFieldErrors(validationRules.fieldErrors)
         const firstField = Object.keys(validationRules.fieldErrors)[0]
@@ -207,7 +209,11 @@ export default function Campeonatos() {
       res.data.map(async (campeonato: { id: number }) => window.api.listarEquipesByCampeonatoId(campeonato.id))
     )
 
-    setEquipesCount((equipes[0].data.totalEquipes) || null)
+    if (equipes.length > 0 && equipes[0]?.data) {
+      setEquipesCount(equipes[0].data.totalEquipes ?? null)
+    } else {
+      setEquipesCount({})
+    }
   };
 
   // const handleDeletarEquipe = async () => {
@@ -517,7 +523,7 @@ export default function Campeonatos() {
                         })
                       }
                     }
-                    className={`${fieldErrors.nome ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    className={`${fieldErrors.data_inicial ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="Ex: Campeonato Sul Bahiano 2026"
                   />
                 </div>
@@ -536,7 +542,7 @@ export default function Campeonatos() {
                         })
                       }
                     }
-                    className={`${fieldErrors.nome ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
+                    className={`${fieldErrors.data_final ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none`}
                     placeholder="Ex: Campeonato Sul Bahiano 2026"
                   />
                 </div>

@@ -153,6 +153,21 @@ export default function Atletas() {
       m.equipe_nome?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+
+
+
+  // Paginate Test 
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const itemsPerPage = 5
+
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
+
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+
+  const currentItems = filteredMembers.slice(startIndex, endIndex)
+
+
   // setor calculado a partir da equipe selecionada
   const setorSelecionado = useMemo(() => {
     return (equipes ?? []).find((e) => e.id === atletaForm.equipe_id)?.setor ?? ''
@@ -195,7 +210,7 @@ export default function Atletas() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-hidden">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
               <tr>
@@ -207,7 +222,7 @@ export default function Atletas() {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredMembers.map((atleta: any, idx: any) => (
+              {currentItems.map((atleta: any, idx: any) => (
                 <motion.tr
                   key={atleta.id}
                   initial={{ opacity: 0, x: -10 }}
@@ -231,11 +246,16 @@ export default function Atletas() {
                     {atleta.equipe_nome}
                   </td>
 
-                  <td className="px-6 py-4">
-                    <span className="w-8 h-8 rounded-full bg-linear-to-br from-green-400 to-green-600 opacity-70 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                  <td className="px-6 py-4 text-right">
+                    <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700">
                       {atleta.equipe_setor}
                     </span>
                   </td>
+                  {/* <td className="px-6 py-4">
+                    <span className="w-8 h-8 rounded-full bg-linear-to-br from-green-400 to-green-600 opacity-70 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                      {atleta.equipe_setor}
+                    </span>
+                  </td> */}
 
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
@@ -264,9 +284,34 @@ export default function Atletas() {
           </table>
         </div>
 
-        <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
-          Mostrando {filteredMembers.length} de {atletas.length} atletas
+        <div className="flex gap-2 mt-4 justify-center">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 rounded ${currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+                }`}
+            >
+              {page}
+            </button>
+          ))}
         </div>
+
+
+        <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
+          {/* Mostrando {currentItems.length} de {custodias.length} registros */}
+          Mostrando{" "}
+          {filteredMembers.length === 0 ? 0 : startIndex + 1}
+          {" "}a{" "}
+          {Math.min(endIndex, filteredMembers.length)}
+          {" "}de {filteredMembers.length} registros
+        </div>
+
+        {/* <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
+          Mostrando {filteredMembers.length} de {atletas.length} atletas
+        </div> */}
       </div>
 
       <AnimatePresence>

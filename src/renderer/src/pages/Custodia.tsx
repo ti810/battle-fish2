@@ -3,6 +3,7 @@ import { Search, Edit2, Trash2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CustodiaCustomer, PeixeCustomer } from '~/src/shared/types/interfaces'
 import { toast } from 'sonner'
+import { formataPeso } from '../lib/utils'
 
 export default function Custodia() {
 
@@ -16,7 +17,7 @@ export default function Custodia() {
     id: 0,
     peso: "",
     equipe_id: 0
-  } )
+  })
 
 
   useEffect(() => {
@@ -46,6 +47,17 @@ export default function Custodia() {
     )
   })
 
+  // Paginate Test 
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const itemsPerPage = 5
+
+  const totalPages = Math.ceil(filteredCustodias.length / itemsPerPage)
+
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+
+  const currentItems = filteredCustodias.slice(startIndex, endIndex)
+
 
   const handleOpenModal = (item: CustodiaCustomer) => {
 
@@ -53,13 +65,13 @@ export default function Custodia() {
       id: item.id,
       peso: item.peso,
       equipe_id: item.id_equipe
-    } )
+    })
 
     setPeixeForm({
       id: item.id,
       peso: item.peso,
       equipe_id: item.id_equipe
-    } )
+    })
 
     setShowModal(true)
   }
@@ -133,7 +145,7 @@ export default function Custodia() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-hidden">
           <table className="w-full text-sm text-left">
 
             <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
@@ -148,7 +160,7 @@ export default function Custodia() {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredCustodias.map((item, idx) => (
+              {currentItems.map((item, idx) => (
                 <motion.tr
                   key={item.id}
                   initial={{ opacity: 0, x: -10 }}
@@ -162,7 +174,7 @@ export default function Custodia() {
                   </td>
 
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {item.peso}
+                    {formataPeso(Number(item.peso))}
                   </td>
 
                   <td className="px-6 py-4 text-gray-600">
@@ -204,8 +216,53 @@ export default function Custodia() {
           </table>
         </div>
 
+        {/* <div className="flex items-center justify-between mt-4">
+
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Anterior
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+          >
+            Próxima
+          </button>
+
+        </div> */}
+
+        <div className="flex gap-2 mt-4 justify-center">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 rounded ${currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200"
+                }`}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+
+
         <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
-          Mostrando {filteredCustodias.length} de {custodias.length} registros
+          {/* Mostrando {currentItems.length} de {custodias.length} registros */}
+          Mostrando{" "}
+          {filteredCustodias.length === 0 ? 0 : startIndex + 1}
+          {" "}a{" "}
+          {Math.min(endIndex, filteredCustodias.length)}
+          {" "}de {filteredCustodias.length} registros
         </div>
 
       </div>
