@@ -91,3 +91,39 @@ export interface CustodiaCustomer{
   campeonato: string
   setor:number
 }
+
+//Dasboard
+export interface DashboardCampeonatoCustomer{
+  nome_campeonato: string
+}
+
+export interface DashboardTotalLancamentoCustomer{
+  total_lancamento: number
+}
+export interface DasboardLancamentoCustomer{
+  nome_equipe: string
+  peso_peixe: string
+  setor: number
+}
+
+export interface DashboardSetorCustomer{
+  numero_setor: number
+  lancamentos: number
+}
+
+export interface DashboardPeixeCustomer{
+  maior_peixe: number
+  nome_equipe: string
+}
+
+export interface DashboardEquipeCustomer{
+  total_equipe: number
+}
+
+export interface DashboardAtletaCustomer{
+  total_atleta: number
+}
+
+export interface DashboardSemLancamentoCustomer{
+  total_equipe: number
+}

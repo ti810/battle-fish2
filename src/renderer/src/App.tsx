@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import Custodia from './pages/Custodia'
 import Grupos from './pages/Equipes'
 import Usuarios from './pages/Usuarios'
+import Dashboard from './pages/Dashboard'
 import Ranking from './pages/Ranking'
 import Login from './pages/Login'
 import Campeonatos from './pages/Campeonatos'
@@ -28,6 +29,7 @@ export default function App(): React.JSX.Element {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Ranking />} />
+            <Route path="/dashboard" element={<Dashboard/>} />
             <Route path="/atletas" element={<Atletas />} />
             <Route path="/equipes" element={<Grupos />} />
             <Route path="/usuarios" element={<Usuarios />} />

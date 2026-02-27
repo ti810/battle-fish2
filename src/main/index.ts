@@ -14,6 +14,7 @@ import { PeixesController } from "../controllers/PeixesController";
 import { RankingController } from "../controllers/RankingController";
 import { CampeonatosController } from "../controllers/CampeonatosController";
 import { CustodiaController } from "../controllers/CustodiaController";
+import { DashboardController } from "../controllers/DashboardController";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -35,7 +36,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
-      devTools: false
+      devTools: true
     },
   });
 
@@ -96,6 +97,7 @@ app.whenReady().then(() => {
   new PeixesController(db);
   new RankingController(db);
   new CustodiaController(db);
+  new DashboardController(db)
 
   electronApp.setAppUserModelId("com.electron");
 

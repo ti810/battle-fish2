@@ -62,6 +62,17 @@ const api = {
   //custodia
   listarCustodia: () => ipcRenderer.invoke('listarCustodia'),
 
+  //Dashboard
+  campeonato: () => ipcRenderer.invoke('campeonato'),
+  totalLancamento: () => ipcRenderer.invoke('totalLancamento'),
+  maiorPeixe: () => ipcRenderer.invoke('maiorPeixe'),
+  totalEquipe: () => ipcRenderer.invoke('totalEquipe'),
+  totalAtleta: () => ipcRenderer.invoke('totalAtleta'),
+  ultimosLances: () => ipcRenderer.invoke('ultimosLances'),
+  setorAtivos: () => ipcRenderer.invoke('setorAtivos'),
+  setorSem: () => ipcRenderer.invoke('setorSem'),
+  
+
   // Message Box 
   showMessageBox: (options: Electron.MessageBoxOptions) => ipcRenderer.invoke('show-message-box', options)
 
