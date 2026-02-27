@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Trophy, Users, UserCircle,ClipboardList, AlignCenterVertical, Fish, Menu, X, Anchor } from 'lucide-react'
+import { Trophy, Users, UserCircle,ClipboardList, AlignCenterVertical, Fish, Menu, X, Anchor, Scale  } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
 
@@ -8,6 +8,7 @@ import logo from '../assets/images/novo_icone_battle_fish.png'
 
 const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) => {
   const links = [
+    {to: '/dashboard', icon: Scale, label: 'Dashboard'},
     { to: '/', icon: Trophy, label: 'Ranking' },
     { to: '/campeonatos', icon: AlignCenterVertical, label: 'Campeonatos' },
     { to: '/equipes', icon: Fish, label: 'Equipes' },
