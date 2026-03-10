@@ -35,7 +35,11 @@ export class AtletasController {
             }
           } catch (error) {
             console.error('Erro ao adicionar novo Atleta:', error)
-            throw error
+            return {
+              success: false,
+              message:
+                error instanceof Error ? error.message : 'Erro ao adicionar novo atleta.'
+            }
           }
         })
     

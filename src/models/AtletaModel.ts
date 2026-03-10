@@ -9,6 +9,27 @@ export class AtletaModel {
     this.criarTabela()
   }
 
+  private equipeEmCampeonatoAtivo(equipeId: number): boolean {
+    const row = this.db
+      .prepare(
+        `
+          SELECT c.ativo
+          FROM equipes e
+          JOIN campeonatos c
+            ON c.id = e.id_campeonato
+          WHERE e.id = ?
+          LIMIT 1
+        `
+      )
+      .get(equipeId) as { ativo: number } | undefined
+
+    if (!row) {
+      return false
+    }
+
+    return Number(row.ativo) === 1
+  }
+
   private criarTabela(): void {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS atletas(
@@ -40,6 +61,12 @@ export class AtletaModel {
     }
 
   add(data: NewAtletaCustomer): number {
+    if (!this.equipeEmCampeonatoAtivo(data.equipe_id)) {
+      throw new Error(
+        'Nao e possivel adicionar atleta. O campeonato desta equipe esta inativo ou inexistente.'
+      )
+    }
+
     const stmt = this.db.prepare(`
         INSERT INTO atletas (nome, equipe_id) 
         VALUES (?, ?)`)
@@ -74,7 +101,8 @@ export class AtletaModel {
       a.nome,
       a.equipe_id,
       e.setor as equipe_setor,
-      e.nome as equipe_nome
+      e.nome as equipe_nome,
+      e.tipo_equipe as equipe_tipo
       FROM atletas a
       JOIN equipes e ON e.id = a.equipe_id
       ORDER BY a.nome`)

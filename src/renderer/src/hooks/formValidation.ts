@@ -28,7 +28,19 @@ export const equipeSchema = z.object({
     .trim()
     .min(4, "Nome da Equipe está muito curtao(Minimo 4 caracteres)")
     .max(50, "Nome da Equipe é muito longo"),
-  setor: z.number().optional(),
+  setor: z.preprocess(
+    (value) => {
+      if (value === null || value === undefined || value === "") {
+        return undefined;
+      }
+
+      return Number(value);
+    },
+    z.number().optional()
+  ),
+  tipo_equipe: z.enum(["Masculino", "Misto", "Senior"], {
+    error: "Selecione o tipo da equipe",
+  }),
 });
 
 export const peixeSchema = z.object({

@@ -2,6 +2,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ElectronAPI } from '@electron-toolkit/preload'
 import {
+  AtivarLicencaPayload,
+  ValidarLicencaPayload,
+  AlterarSenhaPayload,
+  AtualizarUsuarioPerfilPayload,
   NewEquipeCustomer,
   NewUserCustomer,
   NewPeixeCustomer,
@@ -11,7 +15,8 @@ import {
   PeixeCustomer,
   CampeonatoCustomer,
   NewCampeonatoCustomer,
-  CustodiaCustomer
+  CustodiaCustomer,
+  SaveSistemaConfigPayload
 } from '../shared/types/interfaces'
 
 declare global {
@@ -27,7 +32,11 @@ const api = {
   login: (data: { usuario: string; senha: string }) => ipcRenderer.invoke('auth:login', data),
   logout: () => ipcRenderer.invoke('app:logout'),
   addUsuario: (doc: NewUserCustomer) => ipcRenderer.invoke('addUsuario', doc),
-  listarUsuarios: () => ipcRenderer.invoke('listarUsuarios'),
+  listarUsuarios: (actorUserId: number) => ipcRenderer.invoke('listarUsuarios', actorUserId),
+  alterarSenhaUsuario: (payload: AlterarSenhaPayload) => ipcRenderer.invoke('usuario:alterarSenha', payload),
+  atualizarPerfilUsuario: (payload: AtualizarUsuarioPerfilPayload) =>
+    ipcRenderer.invoke('usuario:atualizarPerfil', payload),
+  listarLogsUsuarios: (actorUserId: number) => ipcRenderer.invoke('usuario:listarLogs', actorUserId),
   //Equipes
   addNovaEquipe: (doc: NewEquipeCustomer) => ipcRenderer.invoke('addNovaEquipe', doc),
   listarEquipes: () => ipcRenderer.invoke('listarEquipes'),
@@ -51,16 +60,26 @@ const api = {
   editPeixeById: (doc: PeixeCustomer) => ipcRenderer.invoke('editPeixeById', doc),
   //Ranking
   listarRanking: () => ipcRenderer.invoke('listarRanking'),
+  autorizarRevelacaoRanking: (senha: string) => ipcRenderer.invoke('ranking:autorizarRevelacao', { senha }),
   // Campeonatos
   // listarRankingPorCampeonato: (id: number) => ipcRenderer.invoke('listarRankingPorCampeonato', id),
   verificarCampeonatoAtivo: () => ipcRenderer.invoke('verificarCampeonatoAtivo'),
   addNovoCampeonato: (doc: NewCampeonatoCustomer) => ipcRenderer.invoke('addNovoCampeonato', doc),
   editCampeonatoById: (doc: CampeonatoCustomer) => ipcRenderer.invoke('editCampeonatoById', doc),
-  deletarCampeonato: (id: number) => ipcRenderer.invoke('deletarCampeonato', id),
+  encerrarCampeonato: (id: number) => ipcRenderer.invoke('encerrarCampeonato', id),
+  deletarCampeonato: (id: number) => ipcRenderer.invoke('encerrarCampeonato', id),
   listarCampeonatos: () => ipcRenderer.invoke('listarCampeonatos'),
   listarEquipesByCampeonatoId: (id: number) => ipcRenderer.invoke('listarEquipesByCampeonatoId', id),
   //custodia
   listarCustodia: () => ipcRenderer.invoke('listarCustodia'),
+  // configuracao sistema
+  obterConfiguracaoSistema: (actorUserId: number) => ipcRenderer.invoke('configSistema:obter', actorUserId),
+  salvarConfiguracaoSistema: (payload: SaveSistemaConfigPayload) =>
+    ipcRenderer.invoke('configSistema:salvar', payload),
+  ativarLicencaSistema: (payload: AtivarLicencaPayload) =>
+    ipcRenderer.invoke('configSistema:ativarLicenca', payload),
+  validarLicencaSistema: (payload: ValidarLicencaPayload) =>
+    ipcRenderer.invoke('configSistema:validarLicenca', payload.actor_user_id),
 
   //Dashboard
   campeonato: () => ipcRenderer.invoke('campeonato'),
@@ -72,6 +91,12 @@ const api = {
   setorAtivos: () => ipcRenderer.invoke('setorAtivos'),
   setorSem: () => ipcRenderer.invoke('setorSem'),
   
+  // Window controls (custom title bar)
+  windowMinimize: () => ipcRenderer.invoke('window:minimize'),
+  windowToggleMaximize: () => ipcRenderer.invoke('window:toggle-maximize'),
+  windowIsMaximized: () => ipcRenderer.invoke('window:is-maximized'),
+  windowClose: () => ipcRenderer.invoke('window:close'),
+
 
   // Message Box 
   showMessageBox: (options: Electron.MessageBoxOptions) => ipcRenderer.invoke('show-message-box', options)

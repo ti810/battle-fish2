@@ -3,15 +3,91 @@ export interface NewUserCustomer {
   email?: string
   usuario?: string
   senha: string
+  is_master?: number
 }
 
 export interface UserCustomer {
   id: number
   nome: string
+  usuario?: string | null
   email?: string | null
-  grupo_id: number
-  usuario?: string
+  senha?: string
+  is_master?: number
+  grupo_id?: number
+  criado_em?: string
+}
+
+export interface AuthUserCustomer {
+  id: number
+  nome: string
+  usuario: string
+  is_master: number
+}
+
+export interface AlterarSenhaPayload {
+  actor_user_id: number
+  senha_atual: string
+  nova_senha: string
+}
+
+export interface AtualizarUsuarioPerfilPayload {
+  actor_user_id: number
+  target_user_id: number
+  nome: string
+  usuario: string
+  email: string
+}
+
+export interface UserLogCustomer {
+  id: number
+  usuario_id: number | null
+  usuario_nome: string | null
+  usuario_login: string | null
+  acao: string
+  detalhes: string
   criado_em: string
+}
+
+export interface SaveSistemaConfigPayload {
+  actor_user_id: number
+  empresa_nome: string
+  cnpj: string
+  endereco: string
+  telefone?: string
+  email?: string
+  licenca_chave?: string
+  access_user: {
+    id?: number | null
+    nome: string
+    usuario: string
+    senha: string
+  }
+}
+
+export interface AtivarLicencaPayload {
+  actor_user_id: number
+  licenca_chave: string
+}
+
+export interface ValidarLicencaPayload {
+  actor_user_id: number
+}
+
+export interface SistemaConfigCustomer {
+  id: number
+  empresa_nome: string
+  cnpj: string
+  endereco: string
+  telefone: string
+  email: string
+  licenca_chave: string
+  licenca_ativa: number
+  licenca_ultima_verificacao_em: string | null
+  licenca_ultimo_horario_local_em: string | null
+  atualizado_em: string
+  usuario_acesso_id: number | null
+  usuario_acesso_nome: string | null
+  usuario_acesso_login: string | null
 }
 
 export interface NewAtletaCustomer {
@@ -26,12 +102,16 @@ export interface AtletaCustomer {
   equipe_id: number
   equipe_setor?: string
   equipe_nome?: string
+  equipe_tipo?: TipoEquipe
 }
+
+export type TipoEquipe = 'Masculino' | 'Misto' | 'Senior'
 
 export interface NewEquipeCustomer {
   nome: string
   ativo?: number
   setor?: number
+  tipo_equipe: TipoEquipe
   criado_em?: string
   id_campeonato?: number
   atualizado_em?: string
@@ -63,7 +143,9 @@ export interface PeixeCustomer extends NewPeixeCustomer {
 }
 
 export interface RankingCustomer{
+  id: number
   equipe_nome: string
+  tipo_equipe: TipoEquipe
   peso_total: number
   quantidade: number
   tamanho: number

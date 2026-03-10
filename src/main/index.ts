@@ -15,8 +15,12 @@ import { RankingController } from "../controllers/RankingController";
 import { CampeonatosController } from "../controllers/CampeonatosController";
 import { CustodiaController } from "../controllers/CustodiaController";
 import { DashboardController } from "../controllers/DashboardController";
+import { ConfiguracaoController } from "../controllers/ConfiguracaoController";
+import { ConfiguracaoModel } from "../models/ConfiguracaoModel";
+import { LicenseService } from "./licenseService";
 
 let mainWindow: BrowserWindow | null = null;
+let licenseValidationTimer: NodeJS.Timeout | null = null;
 
 const iconPath =
   process.platform === "win32"
@@ -30,6 +34,8 @@ function createWindow(): void {
     minHeight: 800,
     show: false,
     maximizable: true,
+    frame: false,
+    ...(process.platform === "darwin" ? { titleBarStyle: "hiddenInset" as const } : {}),
     // fullscreen: true,
     autoHideMenuBar: true,
     icon: iconPath,
@@ -79,45 +85,111 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  const userDataPath = app.getPath("userData");
-  const dbPath = path.join(userDataPath, "app.db");
-  const db = new Database(dbPath);
+  try {
+    const userDataPath = app.getPath("userData");
+    const dbPath = path.join(userDataPath, "app.db");
 
-  if (!fs.existsSync(dbPath)) {
-    const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
-    fs.copyFileSync(sourceDbPath, dbPath);
+    if (!fs.existsSync(dbPath)) {
+      const sourceDbPath = path.join(__dirname, "..", "database", "app.db");
+      if (fs.existsSync(sourceDbPath)) {
+        fs.copyFileSync(sourceDbPath, dbPath);
+      }
+    }
+
+    const db = new Database(dbPath);
+    const licenseService = new LicenseService(app);
+
+    // const db = new Database("./src/database/app.db"); //DB modo DEV
+    // UsuariosController cria a tabela `usuarios`, exigida por configuracoes_sistema.
+    new UsuariosController(db);
+    new CampeonatosController(db);
+    new EquipesController(db);
+    new AtletasController(db);
+    new PeixesController(db);
+    new RankingController(db);
+    new CustodiaController(db);
+    new DashboardController(db);
+    new ConfiguracaoController(db, licenseService);
+
+    const configuracaoModel = new ConfiguracaoModel(db);
+
+    let validationInFlight = false;
+    const validateCurrentLicense = async () => {
+      if (validationInFlight) return;
+      validationInFlight = true;
+
+      try {
+        const config = configuracaoModel.obter();
+        const serial = String(config.licenca_chave || "").trim();
+
+        if (!serial) {
+          return;
+        }
+
+        if (configuracaoModel.isClockRollbackDetected(config)) {
+          configuracaoModel.definirStatusLicenca(serial, 0);
+          return;
+        }
+
+        if (Number(config.licenca_ativa) === 1) {
+          configuracaoModel.registrarHorarioLocalLicenca(serial);
+        }
+
+        const response = await licenseService.validate(serial);
+        if (response.status === "NETWORK_ERROR" || response.status === "CONFIG_ERROR") {
+          if (configuracaoModel.isLicensePastRevalidationWindow(config)) {
+            configuracaoModel.definirStatusLicenca(serial, 0);
+          }
+          return;
+        }
+
+        const shouldActivate =
+          response.valid && (response.status === "ACTIVE" || response.status === "ACTIVE_OFFLINE");
+        configuracaoModel.registrarValidacaoOnlineLicenca(
+          serial,
+          shouldActivate ? 1 : 0,
+          response.serverTime
+        );
+      } catch (error) {
+        console.error("Erro ao validar licenca automaticamente:", error);
+      } finally {
+        validationInFlight = false;
+      }
+    };
+
+    electronApp.setAppUserModelId("com.electron");
+
+    app.on("browser-window-created", (_, window) => {
+      optimizer.watchWindowShortcuts(window);
+    });
+
+    createWindow();
+    void validateCurrentLicense();
+
+    licenseValidationTimer = setInterval(() => {
+      void validateCurrentLicense();
+    }, ConfiguracaoModel.LICENSE_REVALIDATION_INTERVAL_MS);
+
+    app.on("activate", function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+
+    ipcMain.handle("app:logout", () => {
+      app.relaunch();
+      app.exit();
+    });
+  } catch (error) {
+    console.error("Falha na inicializacao do app:", error);
+    app.quit();
   }
-
-  // const db = new Database("./src/database/app.db"); //DB modo DEV
-
-  new UsuariosController(db);
-  new CampeonatosController(db);
-  new EquipesController(db);
-  new AtletasController(db);
-  new PeixesController(db);
-  new RankingController(db);
-  new CustodiaController(db);
-  new DashboardController(db)
-
-  electronApp.setAppUserModelId("com.electron");
-
-  app.on("browser-window-created", (_, window) => {
-    optimizer.watchWindowShortcuts(window);
-  });
-
-  createWindow();
-
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-
-  ipcMain.handle("app:logout", () => {
-    app.relaunch();
-    app.exit();
-  });
 });
 
 app.on("window-all-closed", () => {
+  if (licenseValidationTimer) {
+    clearInterval(licenseValidationTimer);
+    licenseValidationTimer = null;
+  }
+
   if (process.platform !== "darwin") {
     app.quit();
   }
@@ -128,6 +200,39 @@ app.on("window-all-closed", () => {
 ipcMain.handle("show-message-box", async (event, options) => {
   const result = await dialog.showMessageBox(options);
   return result;
+});
+
+// Window Controls
+ipcMain.handle("window:minimize", () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+  return true;
+});
+
+ipcMain.handle("window:toggle-maximize", () => {
+  if (!mainWindow) {
+    return { isMaximized: false };
+  }
+
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else {
+    mainWindow.maximize();
+  }
+
+  return { isMaximized: mainWindow.isMaximized() };
+});
+
+ipcMain.handle("window:is-maximized", () => {
+  return { isMaximized: Boolean(mainWindow?.isMaximized()) };
+});
+
+ipcMain.handle("window:close", () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+  return true;
 });
 
 // In this file you can include the rest of your app's specific main process

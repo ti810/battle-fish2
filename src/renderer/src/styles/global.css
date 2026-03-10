@@ -103,3 +103,12 @@
   cursor: not-allowed !important;
   pointer-events: none !important;
 }
+
+.titlebar-drag {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-no-drag {
+  -webkit-app-region: no-drag;
+}

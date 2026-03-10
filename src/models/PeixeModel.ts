@@ -9,6 +9,27 @@ export class PeixeModel {
     this.criarTabela()
   }
 
+  private equipeEmCampeonatoAtivo(equipeId: number): boolean {
+    const row = this.db
+      .prepare(
+        `
+          SELECT c.ativo
+          FROM equipes e
+          JOIN campeonatos c
+            ON c.id = e.id_campeonato
+          WHERE e.id = ?
+          LIMIT 1
+        `
+      )
+      .get(equipeId) as { ativo: number } | undefined
+
+    if (!row) {
+      return false
+    }
+
+    return Number(row.ativo) === 1
+  }
+
   private criarTabela(): void {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS peixes(
@@ -24,6 +45,12 @@ export class PeixeModel {
   }
 
   add(data: NewPeixeCustomer): number {
+    if (!this.equipeEmCampeonatoAtivo(data.equipe_id)) {
+      throw new Error(
+        'Nao e possivel adicionar captura. O campeonato desta equipe esta inativo ou inexistente.'
+      )
+    }
+
     const stmt = this.db.prepare(`
       INSERT INTO peixes (peso, equipe_id) 
       VALUES (?, ?)

@@ -1,10 +1,12 @@
 import { Anchor, Fish, Trophy, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { AuthUserCustomer } from '~/src/shared/types/interfaces'
 
-export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
-  const [loading, setIsLoading] = useState(false)
-  const [formData, setFomrData] = useState({
+export default function Login({ onLogin }: { onLogin: (user: AuthUserCustomer) => void }) {
+  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
     usuario: '',
     senha: ''
   })
@@ -12,29 +14,27 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   const loginSubmit = async () => {
     try {
       if (!formData.usuario || !formData.senha) {
-        alert('Informe email e senha')
+        toast.error('Informe usuario ou email e senha.')
         return
       }
 
+      setLoading(true)
+
       const result = await window.api.login(formData)
 
-      if (!result.success) {
-        alert(result.message)
+      if (!result?.success) {
+        toast.error(result?.message || 'Falha no login.')
         return
       }
 
       onLogin(result.user)
-
-      // redirecionar / fechar modal / carregar app
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error)
-      alert(error.message || 'Email ou senha inválidos')
+      toast.error('Usuario/email ou senha invalidos.')
+    } finally {
+      setLoading(false)
     }
   }
-
-  // useEffect(() => {
-  //     setIsLoading(false)
-  // }, [])
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-500 via-blue-600 to-blue-700 flex items-center justify-center p-4">
@@ -43,7 +43,6 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
       >
-        {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-blue-700 p-8 text-center">
           <motion.div
             initial={{ y: -20 }}
@@ -64,7 +63,6 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
           </motion.p>
         </div>
 
-        {/* Content */}
         <div className="p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -73,11 +71,10 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
             className="space-y-6"
           >
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Bem-vindo!</h2>
-              <p className="text-gray-600">Faça login para acessar o sistema</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Bem-vindo</h2>
+              <p className="text-gray-600">Faca login para acessar o sistema</p>
             </div>
 
-            {/* Features */}
             <div className="grid grid-cols-3 gap-4 py-4">
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
@@ -89,7 +86,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
                 <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                   <Fish className="w-6 h-6 text-green-600" />
                 </div>
-                <p className="text-xs text-gray-600">Grupos</p>
+                <p className="text-xs text-gray-600">Capturas</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-2">
@@ -99,42 +96,40 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
               </div>
             </div>
 
-            <div className="flex-row">
-              <div className="flex flex-col items-center justify-center gap-2 mb-2">
-                <input
-                  type="text"
-                  value={formData.usuario}
-                  onChange={(e) =>
-                    setFomrData({
-                      ...formData,
-                      usuario: e.target.value
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                  placeholder="Usuário"
-                />
-              </div>
-              <div className="flex flex-col items-center justify-center gap-2">
-                <input
-                  type="password"
-                  value={formData.senha}
-                  onChange={(e) =>
-                    setFomrData({
-                      ...formData,
-                      senha: e.target.value
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                  placeholder="Senha"
-                />
-              </div>
-            </div>
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={formData.usuario}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    usuario: e.target.value
+                  })
+                }
+                onKeyDown={(e) => e.key === 'Enter' && loginSubmit()}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                placeholder="Usuario ou email"
+              />
 
-            {/* Login Button */}
+              <input
+                type="password"
+                value={formData.senha}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    senha: e.target.value
+                  })
+                }
+                onKeyDown={(e) => e.key === 'Enter' && loginSubmit()}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                placeholder="Senha"
+              />
+            </div>
 
             <button
               onClick={loginSubmit}
-              disabled={false}
+              disabled={loading}
+              type="button"
               className="w-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {loading ? (
@@ -147,9 +142,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
               )}
             </button>
 
-            <p className="text-xs text-gray-500 text-center">
-              Ao fazer login, você concorda com nossos termos de uso
-            </p>
+            <p className="text-xs text-gray-500 text-center">Acesso restrito a usuarios autorizados.</p>
           </motion.div>
         </div>
       </motion.div>

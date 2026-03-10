@@ -4,10 +4,7 @@ import {
   NewEquipeCustomer,
   PeixeCustomer,
 } from "../shared/types/interfaces";
-import z from "zod";
 import { equipeSchema } from "../renderer/src/hooks/formValidation";
-import { error } from "console";
-import { Await } from "react-router-dom";
 
 type ModelResponse<T> =
   | { success: true; data: T }
@@ -27,6 +24,7 @@ export class EquipeModel {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         setor INTEGER DEFAULT NULL,
+        tipo_equipe TEXT NOT NULL DEFAULT 'Misto',
         ativo INTEGER NOT NULL DEFAULT 1,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TEXT,
@@ -34,13 +32,25 @@ export class EquipeModel {
         FOREIGN KEY (id_campeonato)
           REFERENCES campeonatos(id)
           ON DELETE CASCADE       
-      )
+        )
     `);
+
+    const columns = this.db
+      .prepare("PRAGMA table_info(equipes)")
+      .all() as Array<{ name: string }>;
+
+    const hasTipoEquipe = columns.some((column) => column.name === "tipo_equipe");
+
+    if (!hasTipoEquipe) {
+      this.db.exec(
+        "ALTER TABLE equipes ADD COLUMN tipo_equipe TEXT NOT NULL DEFAULT 'Misto'"
+      );
+    }
   }
 
   listar(): EquipeCustomer[] {
     const stmt = this.db.prepare(`
-      SELECT id, nome, setor, ativo, criado_em, id_campeonato
+      SELECT id, nome, setor, tipo_equipe, ativo, criado_em, id_campeonato
       FROM equipes      
       ORDER BY criado_em DESC
     `);
@@ -54,7 +64,8 @@ export class EquipeModel {
         e.id,
         e.nome,
         e.ativo,
-        e.setor,    
+        e.setor,
+        e.tipo_equipe,
         e.criado_em,
 
         -- Última captura
@@ -100,6 +111,7 @@ export class EquipeModel {
   getById(id: number): EquipeCustomer | null {
     const stmt = this.db.prepare(`
       SELECT id, nome, ativo, setor, criado_em, id_campeonato
+      , tipo_equipe
       FROM equipes
       WHERE id = ?
       LIMIT 1
@@ -132,13 +144,14 @@ export class EquipeModel {
 
     const stmt = this.db.prepare(`
     UPDATE equipes
-    SET nome = ?, setor = ?, ativo = ?, id_campeonato = ?
+    SET nome = ?, setor = ?, tipo_equipe = ?, ativo = ?, id_campeonato = ?
     WHERE id = ?
   `);
 
     const result = stmt.run(
       data.nome,
       data.setor ?? null,
+      data.tipo_equipe,
       data.ativo,
       data.id_campeonato,
       data.id
@@ -228,14 +241,15 @@ export class EquipeModel {
     }
 
     const stmt = this.db.prepare(`
-      INSERT INTO equipes (nome, ativo, setor, criado_em, id_campeonato)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO equipes (nome, ativo, setor, tipo_equipe, criado_em, id_campeonato)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     const res = stmt.run(
       data.nome,
       data.ativo ?? 1,
       data.setor,
+      data.tipo_equipe,
       data.criado_em,
       campeonatoAtivo.id
     );
@@ -243,7 +257,7 @@ export class EquipeModel {
     const equipe = this.db
       .prepare(
         `
-      SELECT id, nome, ativo, setor, criado_em, id_campeonato
+      SELECT id, nome, ativo, setor, tipo_equipe, criado_em, id_campeonato
       FROM equipes
       WHERE id = ?
     `
@@ -271,6 +285,7 @@ export class EquipeModel {
       SELECT 
         e.id,
         e.nome,
+        e.tipo_equipe,
         COUNT(DISTINCT a.id) AS total_atletas,
         COUNT(DISTINCT p.id) AS total_peixes
       FROM equipes e

@@ -33,7 +33,11 @@ export class PeixesController {
         }
       } catch (error) {
         console.error('Erro ao adicionar novo membro:', error)
-        throw error
+        return {
+          success: false,
+          message:
+            error instanceof Error ? error.message : 'Erro ao adicionar nova captura.'
+        }
       }
     })
 

@@ -10,7 +10,11 @@ import { formValidation } from '../hooks/formValidation';
 import { equipeSchema, peixeSchema, atletaSchema } from '../hooks/formValidation';
 import { Rifm } from 'rifm';
 
+const TEAM_TYPE_OPTIONS = ['Masculino', 'Misto', 'Senior'] as const
 
+function parseOptionalNumber(value: string): number | undefined {
+  return value.trim() === '' ? undefined : Number(value)
+}
 
 export default function Equipes() {
 
@@ -32,6 +36,7 @@ export default function Equipes() {
 
   const nomeRef = useRef<HTMLInputElement>(null)
   const setorRef = useRef<HTMLInputElement>(null)
+  const tipoEquipeRef = useRef<HTMLSelectElement>(null)
   const nomeAtref = useRef<HTMLInputElement>(null)
   const qtdeRef = useRef<HTMLInputElement>(null)
 
@@ -60,6 +65,7 @@ export default function Equipes() {
   // Form states
   const [equipeForm, setEquipeForm] = useState<NewEquipeCustomer | EquipeCustomer>({
     nome: "",
+    tipo_equipe: "Misto",
     criado_em: agoraParaSQLite(),
   });
 
@@ -77,6 +83,7 @@ export default function Equipes() {
 
   const initialEquipeForm = {
     nome: "",
+    tipo_equipe: "Misto",
     criado_em: "",
   }
 
@@ -103,6 +110,10 @@ export default function Equipes() {
 
         if (firstField === "setor") {
           setorRef.current?.focus()
+        }
+
+        if (firstField === "tipo_equipe") {
+          tipoEquipeRef.current?.focus()
         }
         toast.error(
           <div className="space-y-1">
@@ -160,6 +171,10 @@ export default function Equipes() {
 
         if (firstField === "setor") {
           setorRef.current?.focus()
+        }
+
+        if (firstField === "tipo_equipe") {
+          tipoEquipeRef.current?.focus()
         }
 
         toast.error(
@@ -290,6 +305,8 @@ export default function Equipes() {
         setShowAddPeixeModal(false)
         carregarDados()
 
+      } else {
+        toast.error(res?.message || "Nao foi possivel salvar esta captura.")
       }
 
 
@@ -347,6 +364,8 @@ export default function Equipes() {
         setShowAtletaModal(false)
         carregarDados()
 
+      } else {
+        toast.error(res?.message || "Nao foi possivel salvar este atleta.")
       }
 
 
@@ -433,7 +452,7 @@ export default function Equipes() {
               <button
                 onClick={() => {
                   setShowAddEquipeModal(true)
-                  setEquipeForm({ nome: "" })
+                  setEquipeForm({ nome: "", tipo_equipe: "Misto" })
                 }}
                 className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-200"
               >
@@ -479,6 +498,7 @@ export default function Equipes() {
                       <span className={`text-xs px-2 py-0.5 rounded-full ${equipe.ativo === 1 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                         {equipe.ativo === 1 ? "ATIVO" : "INATIVO"}
                       </span>
+                      <p className="text-xs text-gray-500 mt-1">{equipe.tipo_equipe}</p>
                     </div>
                   </div>
                   <div className='bg-white relative'>
@@ -770,13 +790,36 @@ export default function Equipes() {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tipo de Equipe <span className='text-red-600'>*</span>
+                    </label>
+                    <select
+                      ref={tipoEquipeRef}
+                      value={equipeForm.tipo_equipe}
+                      onChange={(e) => {
+                        setEquipeForm({ ...equipeForm, tipo_equipe: e.target.value as NewEquipeCustomer['tipo_equipe'] })
+                        setFieldErrors((prev) => {
+                          const { tipo_equipe, ...rest } = prev
+                          return rest
+                        })
+                      }}
+                      className={`${fieldErrors.tipo_equipe ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full rounded-lg p-2 focus:outline-none`}
+                    >
+                      {TEAM_TYPE_OPTIONS.map((tipo) => (
+                        <option key={tipo} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
                     <input
                       type="number"
                       ref={setorRef}
-                      value={equipeForm.setor}
+                      value={equipeForm.setor ?? ""}
                       onChange={(e) => {
-                        setEquipeForm({ ...equipeForm, setor: Number(e.target.value) })
+                        setEquipeForm({ ...equipeForm, setor: parseOptionalNumber(e.target.value) })
                         setFieldErrors((prev) => {
                           const { setor, ...rest } = prev
                           return rest
@@ -839,13 +882,36 @@ export default function Equipes() {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tipo de Equipe <span className='text-red-600'>*</span>
+                    </label>
+                    <select
+                      ref={tipoEquipeRef}
+                      value={equipeForm.tipo_equipe}
+                      onChange={(e) => {
+                        setEquipeForm({ ...equipeForm, tipo_equipe: e.target.value as NewEquipeCustomer['tipo_equipe'] })
+                        setFieldErrors((prev) => {
+                          const { tipo_equipe, ...rest } = prev
+                          return rest
+                        })
+                      }}
+                      className={`${fieldErrors.tipo_equipe ? "border border-red-500 focus:ring-2 focus:ring-red-400" : "border border-gray-300 focus:ring-2 focus:ring-blue-200"} w-full rounded-lg p-2 focus:outline-none`}
+                    >
+                      {TEAM_TYPE_OPTIONS.map((tipo) => (
+                        <option key={tipo} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Setor</label>
                     <input
                       type="number"
                       ref={setorRef}
                       value={equipeForm.setor ?? ""}
                       onChange={(e) => {
-                        setEquipeForm({ ...equipeForm, setor: Number(e.target.value) })
+                        setEquipeForm({ ...equipeForm, setor: parseOptionalNumber(e.target.value) })
                         setFieldErrors((prev) => {
                           const { setor, ...rest } = prev
                           return rest

@@ -29,6 +29,7 @@ export class RankingModel {
     SELECT
       e.id AS id,
       e.nome AS equipe_nome,
+      e.tipo_equipe AS tipo_equipe,
 
       COUNT(p.id) AS quantidade,
 
@@ -45,7 +46,7 @@ export class RankingModel {
       ON p.equipe_id = e.id
       AND p.deletado_em IS NULL
 
-    GROUP BY e.id, e.nome
+    GROUP BY e.id, e.nome, e.tipo_equipe
 
     ORDER BY
       peso_total DESC,

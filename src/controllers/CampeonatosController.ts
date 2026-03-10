@@ -63,9 +63,18 @@ export class CampeonatosController {
 
     ipcMain.handle('editCampeonatoById', async (_, doc: CampeonatoCustomer) => {
       try {
+        const updated = this.model.edit(doc)
+
+        if (!updated) {
+          return {
+            success: false,
+            message: 'Campeonato nao encontrado.'
+          }
+        }
+
         return {
           success: true,
-          data: this.model.edit(doc)
+          data: updated
         }
       } catch (error) {
         console.error('Erro ao buscar Campeonato:', error)
@@ -75,9 +84,18 @@ export class CampeonatosController {
 
     ipcMain.handle('encerrarCampeonato', async (_, id: number) => {
       try {
+        const encerrado = this.model.encerrar(id)
+
+        if (!encerrado) {
+          return {
+            success: false,
+            message: 'Campeonato nao encontrado para encerramento.'
+          }
+        }
+
         return {
           success: true,
-          data: this.model.encerrar(id)
+          data: encerrado
         }
       } catch (error) {
         console.error('Erro ao buscar Campeonato:', error)
